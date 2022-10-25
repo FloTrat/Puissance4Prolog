@@ -1,0 +1,129 @@
+body{
+	background-color: #bdc3c7;
+	padding : 20px;
+}
+
+#board{
+    user-select: none;
+	display : table;
+	background-color: blue;
+	border-radius: 2px;
+	margin:  40px auto;
+	padding : 10px;
+	box-shadow: 5px 5px 0px 0px #3166ff;
+	transition: transform linear 1s;
+	transform: rotateX(0deg) rotateY(0deg);
+}
+
+#board:hover{
+	/*transform: rotateX(30deg) rotateY(30deg);*/
+}
+
+.board-column{
+	width:70px;
+	display: table-cell;
+}
+
+.board-column.selectable:hover{
+	background-color: rgba(1,1,1,0.2);
+}
+
+
+
+.board-row{
+	margin : 5px;
+	height : 60px;
+	border-radius: 100%;
+	box-shadow: inset 5px 5px 0px 0px #3166ff;
+	background-color : #bdc3c7;
+}
+
+.board-token{
+	width : 100%;
+	height : 100%;
+	border-radius: 100%;
+}
+
+.board-token.rouge{
+	background-color: red;
+}
+.board-token.rouge.active{
+	background-color: #800;
+}
+
+.board-token.jaune{
+	background-color: yellow;
+}
+.board-token.jaune.active{
+	background-color: #880;
+}
+
+.player{
+	padding : 5px;
+	background-color: #eee;
+}
+
+.player:hover{
+	background-color: #555;
+	color: white;
+}
+
+.player:active{
+	background-color: #222;
+	color: white;
+}
+
+.selectable{
+	cursor: pointer;
+}
+#control-box{
+	min-height: 116px;
+}
+#msg-box{
+	height : 300px;
+	overflow: auto;
+}
+#plays-box{
+	height : 300px;
+	overflow: auto;
+}
+
+.msg{
+	margin : 0;
+	padding : 5px;
+	border-bottom: #ccc solid 1px;
+}
+
+.msg.bg-jaune{
+	background-color: yellow;
+	color : black;	
+}
+
+.msg.bg-rouge{
+	background-color: red;
+	color : white;	
+}
+
+.list-group-item-jaune{
+	background-color: #f1c40f;
+	color: #fff;
+}
+
+.list-group-item-rouge{
+	background-color: #e74c3c;
+	color: #fff;
+}
+
+.list-group-item-primary{
+	background-color: #337ab7;
+	color: #fff;
+}
+
+.list-group-item-win{
+	background-color: #2ecc71;
+	color: #fff;
+}
+
+.no-outline{
+	outline: none!important;
+}
