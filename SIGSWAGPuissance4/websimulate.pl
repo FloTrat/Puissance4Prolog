@@ -4,15 +4,6 @@
 %%%%%%%%%%%%%%%%
 %% Inclusions %%
 %%%%%%%%%%%%%%%%
-
-:- use_module(library(http/thread_httpd)).
-:- use_module(library(http/http_dispatch)).
-:- use_module(library(http/http_error)).
-:- use_module(library(http/html_write)).
-:- use_module(library(http/http_parameters)).
-:- use_module(library(http/http_files)).
-:- use_module(library(http/http_json)).
-:- use_module(library(http/json_convert)).
 :- use_module(jeu).
 :- use_module(ia).
 :- use_module(eval).
@@ -23,58 +14,14 @@
 %% Prédicats publics %%
 %%%%%%%%%%%%%%%%%%%%%%%
 
-% start/0
-% start lance le serveur sur le port 8000.
-% Est vrai lorsque le webserver est correctement démarré
-start :- serveur(8000).
-
-% serveur/1(+Port)
-% Démarre le serveur, rendant accessible l'interface web à http://localhost:"Port"
-% Est vrai lorsque le webserver est correctement démarré
-serveur(Port) :- http_server(http_dispatch, [port(Port)]).
 
 
 %%%%%%%%%%%%%%%%%%%%%%
 %% Prédicats privés %%
 %%%%%%%%%%%%%%%%%%%%%%
 
-% Déclarations dynamiques, multifiles et constantes de location
-:- multifile http:location/3.
-:- dynamic   http:location/3.
-http:location(files, '/f', []).
-
-
-%%%%%%%%%%%
-%%  Routage
-
-% Affiliation d'un prédicat/1(+Request) à une route
-% Lorsqu'une requête est récupérée sur l'une des route suivante, le prédicat correspondant est appelé.
-:- http_handler('/', helloAction, []).
-:- http_handler('/init', initAction, []).
-:- http_handler('/selectPlayers', selectionnerJoueurAction, []).
-:- http_handler('/playFromIA', tourIAAction, []).
-:- http_handler('/validHumanPlay', validerTourHumain, []).
-:- http_handler(files(.), fichierAction, [prefix]).
-:- http_handler('/game', indexAction, []).
-
-
 %%%%%%%%%%%
 %%  Actions
-
-% indexAction/1(+Request)
-% Affiche la page d'accueil du jeu.
-% Répond la page index.html située dans le dossier web/pages
-indexAction(Request) :-
-    http_reply_from_files('web/pages', [], Request).
-indexAction(Request) :-
-    http_404([], Request).
-
-% helloAction/1(+Request)
-% Affiche le message "Hello world".
-% Répond un message attestant du fonctionnement du serveur
-helloAction(_) :-
-    format('Content-type: text/plain~n~n'),
-    format('Hello world ! Server is running').
 
 % initAction/1(+Request)
 % Initialise le jeu, son plateau et ses joueurs.
@@ -83,16 +30,7 @@ initAction(_) :-
     initJeu,
     retractall(joueurCourant(_,_)),
     retractall(autreJoueur(_,_)),
-    findall([X,Y], typeJoueur(X,Y), Z),
 	selectionnerJoueurAction.
-
-% fichierAction/1(+Request)
-% Sert les fichiers publics demandé sous l'url /f/fichier.extension.
-% Répond le fichier demandé situé dans le dossier web/assets
-fichierAction(Request) :-
-    http_reply_from_files('web/assets', [], Request).
-fichierAction(Request) :-
-    http_404([], Request).
 
 % selectionnerJoueurAction/1(+Request)
 % Récupère des parametres GET les joueurs sélectionnés les unifie les unifie à leur couleurs
@@ -119,11 +57,10 @@ validerTourHumain(Request) :-
     atom_number(Col, Colonne),
     joueurCourant(CouleurJCourant,_),
     placerJeton(Colonne, Ligne, CouleurJCourant),
-    statutJeu(Colonne,Ligne,CouleurJCourant, Statut),
-    reply_json(json{correct:true, gameStatus:Statut, colPlayed:Colonne, rowPlayed:Ligne}),
+    statutJeu(Colonne,Ligne,CouleurJCourant),
     !.
-validerTourHumain(_) :-
-    reply_json(json{correct:true, gameStatus:invalid}).
+%validerTourHumain(_) :-
+%    reply_json(json{correct:true, gameStatus:invalid}).
 
 % tourIAAction/1(+Request)
 % ! Le joueurCourant doit être une IA donc la manière de jouée est renseignée par le prédicat 'obtenirCoup'
@@ -138,7 +75,7 @@ tourIAAction(_) :-
     obtenirCoup(CouleurJCourant,TypeJoueur,Colonne),
     placerJeton(Colonne,Ligne,CouleurJCourant),
 	afficher,
-    statutJeu(Colonne,Ligne,CouleurJCourant, Statut).
+    statutJeu(Colonne,Ligne,CouleurJCourant).
 
 
 %%%%%%%%%%%%%%%
@@ -148,13 +85,13 @@ tourIAAction(_) :-
 % Unifie à Statut l'état du jeu,
 % avec comme dernier coup joué : un jeton en Colonne Ligne par CouleurJCourant
 % Status s'unifie à "win" si le coup a amené à une victoire.
-statutJeu(Colonne,Ligne,CouleurJCourant, 'win') :-
+statutJeu(Colonne,Ligne,CouleurJCourant) :-
     gagne(Colonne,Ligne,CouleurJCourant), write(CouleurJCourant), write(' win').
 % Status s'unifie à "draw" si la partie se termine sur une égalité,
-statutJeu(_,_,_, 'draw') :-
+statutJeu(_,_,_) :-
     not(coupPossible), write('draw').
 % Status s'unifie à "continue" si la partie n'est pas terminée (dans ce cas le joueur courant est changé),
-statutJeu(_,_,_, 'continue') :-
+statutJeu(_,_,_) :-
     changerJoueur,
 	tourIAAction(_).
 
