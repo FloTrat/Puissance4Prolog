@@ -26,7 +26,7 @@
 % initAction/1(+Request)
 % Initialise le jeu, son plateau et ses joueurs.
 % Répond une liste des joueurs disponibles ainsi que leur code correspondant
-initAction(_) :-
+initAction :-
     initJeu,
     retractall(joueurCourant(_,_)),
     retractall(autreJoueur(_,_)),
@@ -42,7 +42,15 @@ selectionnerJoueurAction :-
     % random_select(TypeJoueurR,[TypeJoueur1,TypeJoueur2],[TypeJoueurJ|_]),
     assert(joueurCourant(rouge,TypeJoueurR)),
     assert(autreJoueur(jaune,TypeJoueurJ)),
-	tourIAAction(_).
+	tourAction.
+
+tourAction :-
+    joueurCourant(CouleurJCourant,1),
+	validerTourHumain(CouleurJCourant),!.
+
+tourAction :-
+	tourIAAction.
+
 
 % validerTourHumain/1(+Request)
 % Récupère des parametres GET la colonne jouées par un Humain, Vérifie la validité du coup, et le joue
@@ -52,9 +60,9 @@ selectionnerJoueurAction :-
 %   "draw" si la partie se termine sur une égalité,
 %   "continue" si la partie n'est pas terminée (dans ce cas le joueur courant est changé),
 %   "win" si le coup a amené à une victoire.
-validerTourHumain(Request) :-
-    http_parameters(Request,[ col(Col, [])]),
-    atom_number(Col, Colonne),
+validerTourHumain(CouleurJCourant) :-
+	write('Saisissez votre colonne :'), nl,
+    read(Colonne), integer(Colonne),
     joueurCourant(CouleurJCourant,_),
     placerJeton(Colonne, Ligne, CouleurJCourant),
     statutJeu(Colonne,Ligne,CouleurJCourant),
@@ -70,7 +78,7 @@ validerTourHumain(Request) :-
 %   "draw" si la partie se termine sur une égalité,
 %   "continue" si la partie n'est pas terminée (dans ce cas le joueur courant est changé),
 %   "win" si le coup a amené à une victoire.
-tourIAAction(_) :-
+tourIAAction :-
     joueurCourant(CouleurJCourant,TypeJoueur),
     obtenirCoup(CouleurJCourant,TypeJoueur,Colonne),
     placerJeton(Colonne,Ligne,CouleurJCourant),
@@ -93,7 +101,7 @@ statutJeu(_,_,_) :-
 % Status s'unifie à "continue" si la partie n'est pas terminée (dans ce cas le joueur courant est changé),
 statutJeu(_,_,_) :-
     changerJoueur,
-	tourIAAction(_).
+	tourAction.
 
 % obtenirCoup/1(+CouleurJCourant,+CodeIA,-Coup)
 % Unifie à Colonne le coup joué par l'IA dont le code est CodeIA
