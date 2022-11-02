@@ -46,7 +46,8 @@ selectionnerJoueurAction :-
 
 tourAction :-
     joueurCourant(CouleurJCourant,1),
-	validerTourHumain(CouleurJCourant),!.
+	validerTourHumain(CouleurJCourant),
+	!.
 
 tourAction :-
 	tourIAAction.
@@ -61,10 +62,14 @@ tourAction :-
 %   "continue" si la partie n'est pas terminée (dans ce cas le joueur courant est changé),
 %   "win" si le coup a amené à une victoire.
 validerTourHumain(CouleurJCourant) :-
+	typeJoueur(1,Type),
+	write('C\'est au joueur '), write(CouleurJCourant), write(' ('), write(Type), write(') de jouer.'),  nl,
 	write('Saisissez votre colonne :'), nl,
     read(Colonne), integer(Colonne),
     joueurCourant(CouleurJCourant,_),
     placerJeton(Colonne, Ligne, CouleurJCourant),
+	afficher,
+	write('Joueur '), write(CouleurJCourant), write(' vient de jouer dans la colonne '), write(Colonne), write('.'),  nl,
     statutJeu(Colonne,Ligne,CouleurJCourant),
     !.
 %validerTourHumain(_) :-
@@ -80,9 +85,12 @@ validerTourHumain(CouleurJCourant) :-
 %   "win" si le coup a amené à une victoire.
 tourIAAction :-
     joueurCourant(CouleurJCourant,TypeJoueur),
+	typeJoueur(TypeJoueur,Type),
+	write('C\'est au joueur '), write(CouleurJCourant), write(' ('), write(Type), write(') de jouer.'),  nl,
     obtenirCoup(CouleurJCourant,TypeJoueur,Colonne),
     placerJeton(Colonne,Ligne,CouleurJCourant),
 	afficher,
+	write('Joueur '), write(CouleurJCourant), write(' vient de jouer dans la colonne '), write(Colonne), write('.'),  nl,
     statutJeu(Colonne,Ligne,CouleurJCourant).
 
 
@@ -94,7 +102,7 @@ tourIAAction :-
 % avec comme dernier coup joué : un jeton en Colonne Ligne par CouleurJCourant
 % Status s'unifie à "win" si le coup a amené à une victoire.
 statutJeu(Colonne,Ligne,CouleurJCourant) :-
-    gagne(Colonne,Ligne,CouleurJCourant), write(CouleurJCourant), write(' win').
+    gagne(Colonne,Ligne,CouleurJCourant), write('Joueur '), write(CouleurJCourant), write(' a gagné!').
 % Status s'unifie à "draw" si la partie se termine sur une égalité,
 statutJeu(_,_,_) :-
     not(coupPossible), write('draw').
