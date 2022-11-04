@@ -24,20 +24,20 @@
 evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
 	assert(caseTest(X,Y,JoueurCourant)),
 	assert(ennemiTest(AutreJoueur)),
-	poidsPuissance3(PoidsPuissance3), poidsPosition(PoidsPosition), poidsDensite(PoidsDensite), poidsAdjacence(PoidsAdjacence),
+	poidsPuissance3(PoidsPuissance3), poidsPosition(PoidsPosition), poidsDensite(PoidsDensite), poidsAdjacence(PoidsAdjacence), poidsAlea(PoidsAlea),
 	evalPosition(JoueurCourant,Score1,PoidsPosition),
 	evalPuissances3(JoueurCourant,AutreJoueur,Score2,PoidsPuissance3),
 	densite(JoueurCourant,Score3,PoidsDensite),
 	evalAdjacence(X,Y,JoueurCourant,Score4, PoidsAdjacence),
-	%write("Position: "),write(Score1),write("Puissance3: "),write(Score2),write("Densite: "),write(Score3),write("Adjacence: "),write(Score4), nl,
+	%write("Position: "),write(Score1),write(" Puissance3: "),write(Score2),write(" Densite: "),write(Score3),write(" Adjacence: "),write(Score4), nl,
 	retract(caseTest(X,Y,JoueurCourant)),
 	retract(ennemiTest(AutreJoueur)),
 	random_between(-2,2,Perturbation),
 	Score is Score1 * PoidsPosition
 			+ Score2 * PoidsPuissance3
-			+ Score3 %why isn't there a multiplicative constant?
-			+ Score4 %why isn't there a multiplicative constant?
-			+ Perturbation. %bruit
+			+ Score3 * PoidsDensite
+			+ Score4 * PoidsAdjacence
+			+ Perturbation * PoidsAlea. %bruit
 
 %%%%%%%%%%%%%%%%%%%%%%
 %% Prédicats privés %%
@@ -108,7 +108,7 @@ evalCasesVides(Joueur,ScoreCase) :-
 	caseVideTest(X2,Y1),
 	caseTest(X2,Y2,_),
 	caseTest(X1,Y2,_),
-	(gagneTestDirect(X1,Y1,Joueur) -> ScoreCase1=100 ; ScoreCase1=0),
+	(gagneTestDirect(X1,Y1,Joueur) -> ScoreCase1=100 ; ScoreCase1=0), % (If -> Then ; Else)
 	(gagneTestDirect(X2,Y1,Joueur) -> ScoreCase2=100 ; ScoreCase2=0),
 	ScoreCase is ScoreCase1+ScoreCase2.
 
@@ -183,10 +183,11 @@ gagneTestDirect(X,Y,J) :-
 gagneTestDirectLigne(X,Y,J) :-
 	decr(X,X1),
 	gaucheVerif(X1,Y,J,Rg),
-	incr(X,_),
-	droiteVerif(X,_,J,Rd),
+	incr(X,X2),
+	droiteVerif(X2,Y,J,Rd),
 	!,
-	Rf is Rg+Rd, Rf>2.
+	Rf is Rg+Rd,
+	Rf>2.
 
 gaucheVerif(X,Y,J,Rg):-
 	gauche(X,Y,J,0,Rg).
