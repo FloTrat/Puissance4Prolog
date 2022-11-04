@@ -66,7 +66,6 @@ validerTourHumain(CouleurJCourant) :-
 	write('C\'est au joueur '), write(CouleurJCourant), write(' ('), write(Type), write(') de jouer.'),  nl,
 	write('Saisissez votre colonne :'), nl,
     read(Colonne), integer(Colonne),
-    joueurCourant(CouleurJCourant,_),
     placerJeton(Colonne, Ligne, CouleurJCourant),
 	afficher,
 	write('Joueur '), write(CouleurJCourant), write(' vient de jouer dans la colonne '), write(Colonne), write('.'),  nl,
@@ -121,7 +120,7 @@ obtenirCoup(CouleurJCourant,3,Coup) :-
     % iaMinimax(JoueurCourant,Coup,Profondeur,PoidsPosition,PoidsPuissance3,PoidsDensite,PoidsAdjacence)
     iaMinimax(CouleurJCourant,Coup,3,1,0,0,0).
 obtenirCoup(CouleurJCourant,4,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,3,1,0,0,0).
+    iaMinimax(CouleurJCourant,Coup,3,1,0,0,1).
 obtenirCoup(CouleurJCourant,5,Coup) :-
     iaMinimax(CouleurJCourant,Coup,4,1,0,0,0).
 obtenirCoup(CouleurJCourant,6,Coup) :-

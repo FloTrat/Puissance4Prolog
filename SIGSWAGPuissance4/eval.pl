@@ -35,7 +35,7 @@ evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
 	Score is Score1 * PoidsPosition
 			+ Score2 * PoidsPuissance3
 			+ Score3
-			+ Score4
+			+ Score4 * PoidsAdjacence
 			+ Perturbation.
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -124,8 +124,16 @@ evalCasesVides(Joueur,ScoreCase) :-
 evalAdjacence(X,Y,Joueur,Note,PoidsAdjacence) :-
 	PoidsAdjacence>0,
 	aggregate_all(count,caseAdjacente(X,Y,Joueur,_,_),N),
-	pow(N,2,Note).
+	decr(N,N1),
+	pow(N1,2,Note).
 evalAdjacence(_,_,_,0,_).
+
+caseAdjacente(X,Y,Joueur,Xadj,Yadj) :-
+	incr(X,X2), decr(X,X1),
+	incr(Y,Y2), decr(Y,Y1),
+	between(X1,X2,Xadj), between(Y1,Y2,Yadj),
+	caseTest(Xadj,Yadj,Joueur).
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %			HEURISTIQUE PAR DENSITE DE PION
