@@ -24,15 +24,31 @@
 % IA1 joue contre IA2 "NbIterations" fois le predicat affiche combien de fois qui a battu qui
 runTest(NbIterations,IA1,IA2) :-
 	NbIterationsParIA is NbIterations//2,
-	runTestIAXEnPremier(NbIterationsParIA,IA1,IA2,0,NbFoisIA1GagneEnCommencant,0,NbFoisIA1PerdEnCommencant),
-	runTestIAXEnPremier(NbIterationsParIA,IA2,IA1,0,NbFoisIA2GagneEnCommencant,0,NbFoisIA2PerdEnCommencant),
+	call_time(runTestIAXEnPremier(NbIterationsParIA,IA1,IA2,0,NbFoisIA1GagneEnCommencant,0,NbFoisIA1PerdEnCommencant), Dict1),
+	call_time(runTestIAXEnPremier(NbIterationsParIA,IA2,IA1,0,NbFoisIA2GagneEnCommencant,0,NbFoisIA2PerdEnCommencant), Dict2),
 	typeJoueur(IA1,TypeIA1),
 	typeJoueur(IA2,TypeIA2),
+	assert(STATS_IA1(Dict1.get(wall), Dict1.get(inferences), Dict2.get(wall), Dict2.get(inferences))),
+	% STATS_IA1 = {TEMPS_SI_IA1_COMMENCE, NB_ITERATIONS_SI_IA1_COMMENCE, TEMPS_SI_IA1_NE_COMMENCE_PAS, NB_ITERATIONS_SI_IA1_NE_COMMENCE_PAS}
+
+	assert(STATS_IA2(Dict2.get(wall), Dict2.get(inferences), STATS_IA1(Dict2.get(wall), Dict1.get(inferences))),
+	% STATS_IA2 = {TEMPS_SI_IA2_COMMENCE, NB_ITERATIONS_SI_IA2_COMMENCE, TEMPS_SI_IA2_NE_COMMENCE_PAS, NB_ITERATIONS_SI_IA2_NE_COMMENCE_PAS}
 	write(TypeIA2), write(' en commençant : a gagné '), write(NbFoisIA2GagneEnCommencant),write(' fois et a perdu '),write(NbFoisIA2PerdEnCommencant),write(' fois.'),
 	nl,
 	write(TypeIA1), write(' en commençant : a gagné '), write(NbFoisIA1GagneEnCommencant),write(' fois et a perdu '),write(NbFoisIA1PerdEnCommencant),write(' fois.'),
+	statistics,
 	!.
 
+benchmark(NbIterations, IA1, IA2) :-
+	call_time(runTest(NbIterations, IA1, IA2),Dict),
+	Tmoy is Dict.get(wall) / NbIterations
+	write('Temps moyen : '), write(Tmoy),
+	nl,
+	write('Temps total : '), write(Tmoy * NbIterations),
+	nl,
+	statistics, %for printing threads' information like allocated memory for instance, number of inferences, etc...
+	!.
+	
 %%%%%%%%%%%%%%%%%%%%%%
 %% Prédicats privés %%
 %%%%%%%%%%%%%%%%%%%%%%

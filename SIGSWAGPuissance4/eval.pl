@@ -28,15 +28,16 @@ evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
 	evalPosition(JoueurCourant,Score1,PoidsPosition),
 	evalPuissances3(JoueurCourant,AutreJoueur,Score2,PoidsPuissance3),
 	densite(JoueurCourant,Score3,PoidsDensite),
-	evalAdjacence(X,Y,_,Score4, PoidsAdjacence),
+	evalAdjacence(X,Y,JoueurCourant,Score4, PoidsAdjacence),
+	%write("Position: "),write(Score1),write("Puissance3: "),write(Score2),write("Densite: "),write(Score3),write("Adjacence: "),write(Score4), nl,
 	retract(caseTest(X,Y,JoueurCourant)),
 	retract(ennemiTest(AutreJoueur)),
 	random_between(-2,2,Perturbation),
 	Score is Score1 * PoidsPosition
 			+ Score2 * PoidsPuissance3
-			+ Score3
-			+ Score4 * PoidsAdjacence
-			+ Perturbation.
+			+ Score3 %why isn't there a multiplicative constant?
+			+ Score4 %why isn't there a multiplicative constant?
+			+ Perturbation. %bruit
 
 %%%%%%%%%%%%%%%%%%%%%%
 %% Prédicats privés %%
@@ -113,7 +114,7 @@ evalCasesVides(Joueur,ScoreCase) :-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%			HEURISTIQUE PAR ADJACENCE
+%			HEURISTIQUE PAR ADJACENCE % ça marche peut-être (cf. Flo)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
