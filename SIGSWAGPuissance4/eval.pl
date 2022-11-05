@@ -24,12 +24,13 @@
 evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
 	assert(caseTest(X,Y,JoueurCourant)),
 	assert(ennemiTest(AutreJoueur)),
-	poidsPuissance3(PoidsPuissance3), poidsPosition(PoidsPosition), poidsDensite(PoidsDensite), poidsAdjacence(PoidsAdjacence), poidsAlea(PoidsAlea),
+	poidsPuissance3(PoidsPuissance3), poidsPosition(PoidsPosition), poidsDensite(PoidsDensite), poidsAdjacence(PoidsAdjacence), poidsAlea(PoidsAlea), poidsTest(PoidsTest),
 	evalPosition(JoueurCourant,Score1,PoidsPosition),
 	evalPuissances3(JoueurCourant,AutreJoueur,Score2,PoidsPuissance3),
 	densite(JoueurCourant,Score3,PoidsDensite),
 	evalAdjacence(X,Y,JoueurCourant,Score4, PoidsAdjacence),
-	%write("Position: "),write(Score1),write(" Puissance3: "),write(Score2),write(" Densite: "),write(Score3),write(" Adjacence: "),write(Score4), nl,
+	evalTest(JoueurCourant,AutreJoueur,Score5,PoidsTest),
+	%write("Position: "),write(Score1),write(" Puissance3: "),write(Score2),write(" Densite: "),write(Score3),write(" Adjacence: "),write(Score4),write(" Test: "),write(Score5), nl,
 	retract(caseTest(X,Y,JoueurCourant)),
 	retract(ennemiTest(AutreJoueur)),
 	random_between(-2,2,Perturbation),
@@ -37,6 +38,7 @@ evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
 			+ Score2 * PoidsPuissance3
 			+ Score3 * PoidsDensite
 			+ Score4 * PoidsAdjacence
+			+ Score5 * PoidsTest
 			+ Perturbation * PoidsAlea. %bruit
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -112,6 +114,92 @@ evalCasesVides(Joueur,ScoreCase) :-
 	(gagneTestDirect(X2,Y1,Joueur) -> ScoreCase2=100 ; ScoreCase2=0),
 	ScoreCase is ScoreCase1+ScoreCase2.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%			HEURISTIQUE EN COURS DE TEST
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% evalTest/3(+JoueurCourant,+AutreJoueur,-Score)
+% Évalue en cherchant les positions faisant gagner.
+% ScoreFinal s'unifie au score de la position.
+evalTest(JoueurCourant,AutreJoueur,ScoreFinal,PoidsTest) :-
+	PoidsTest>0,
+	findall(S,evalCasesVidesTest(JoueurCourant,S),ScoresCourant), sum(ScoresCourant,ScoreCourant),
+	findall(S,evalCasesVidesTest(AutreJoueur,S),ScoresAutre), sum(ScoresAutre,ScoreAutre),
+	ScoreFinal is ScoreCourant - ScoreAutre.
+	%write(ScoreCourant), write(" "), write(ScoreAutre), write(" "), write(ScoreFinal), nl.
+evalTest(_,_,0,_).
+
+evalCasesVidesTest(Joueur,ScoreCase) :-
+	nbColonnes(NBCOLONNES), nbLignes(NBLIGNES),
+	between(1,NBCOLONNES,X), between(1,NBLIGNES,Y),
+	caseTest(X,Y,Joueur),
+	evalLigne(X,Y,Joueur,ScoreLigne),
+	evalCol(X,Y,Joueur,ScoreCol),
+	evalDiag1(X,Y,Joueur,ScoreDiag1),
+	evalDiag2(X,Y,Joueur,ScoreDiag2),
+	max_list([ScoreLigne,ScoreCol,ScoreDiag1,ScoreDiag2], ScoreCase).
+
+%% ligne
+evalLigne(X,Y,J,Score) :-
+	gaucheVerifTest(X,Y,J,GaucheJ),
+	droiteVerifTest(X,Y,J,DroiteJ),
+	gaucheVideTest(GaucheJ,Y,J,GaucheV),
+	droiteVideTest(DroiteJ,Y,J,DroiteV),
+	DroiteV-GaucheV+1 >= 4,!,
+	NCaseJoueur is DroiteJ-GaucheJ+1,
+	pow(NCaseJoueur,3,Score).
+evalLigne(_,_,_,0).
+
+gaucheVerifTest(X,Y,J,GaucheJ) :-
+	decr(X,X1),
+	caseTest(X1,Y,J),!,
+	gaucheVerifTest(X1,Y,J,GaucheJ).
+gaucheVerifTest(X,_,_,X).
+
+droiteVerifTest(X,Y,J,DroiteJ) :-
+	incr(X,X1),
+	caseTest(X1,Y,J),!,
+	droiteVerifTest(X1,Y,J,DroiteJ).
+droiteVerifTest(X,_,_,X).
+
+gaucheVideTest(X,Y,J,GaucheV) :-
+	X > 1,
+	decr(X,X1),
+	caseVideTest(X1,Y),!,
+	gaucheVideTest(X1,Y,J,GaucheV).
+gaucheVideTest(X,_,_,X).
+
+droiteVideTest(X,Y,J,DroiteV) :-
+	nbColonnes(NBCOLONNES),
+	X < NBCOLONNES,
+	incr(X,X1),
+	caseVideTest(X1,Y),!,
+	droiteVideTest(X1,Y,J,DroiteV).
+droiteVideTest(X,_,_,X).
+
+%% colonne
+evalCol(X,Y,J,Score) :-
+	incr(Y,Y2),
+	caseVideTest(X,Y2),!,
+	basVerifTest(X,Y,J,NCaseJoueur),
+	nbLignes(NBLIGNES),
+	NBLIGNES-Y+NCaseJoueur >= 4,!,
+	pow(NCaseJoueur,3,Score).
+evalCol(_,_,_,0).
+
+basVerifTest(X,Y,J,NCaseJoueur) :-
+	caseTest(X,Y,J),!,
+	decr(Y,Y1),
+	basVerifTest(X,Y1,J,NCaseJoueur1),
+	incr(NCaseJoueur1,NCaseJoueur).
+basVerifTest(_,_,_,0).
+
+%% diag1 (descendante)
+evalDiag1(_,_,_,0).
+
+%% diag2 (montante)
+evalDiag2(_,_,_,0).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %			HEURISTIQUE PAR ADJACENCE % ça marche peut-être (cf. Flo)
