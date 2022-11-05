@@ -126,8 +126,8 @@ evalTest(JoueurCourant,AutreJoueur,ScoreFinal,PoidsTest) :-
 	PoidsTest>0,
 	findall(S,evalCasesVidesTest(JoueurCourant,S),ScoresCourant), sum(ScoresCourant,ScoreCourant),
 	findall(S,evalCasesVidesTest(AutreJoueur,S),ScoresAutre), sum(ScoresAutre,ScoreAutre),
-	ScoreFinal is ScoreCourant - ScoreAutre.
-	%write(ScoreCourant), write(" "), write(ScoreAutre), write(" "), write(ScoreFinal), nl.
+	ScoreFinal is ScoreCourant - ScoreAutre
+	.%,write(ScoreCourant), write(" "), write(ScoreAutre), write(" "), write(ScoreFinal), nl.
 evalTest(_,_,0,_).
 
 evalCasesVidesTest(Joueur,ScoreCase) :-
@@ -138,17 +138,37 @@ evalCasesVidesTest(Joueur,ScoreCase) :-
 	evalCol(X,Y,Joueur,ScoreCol),
 	evalDiag1(X,Y,Joueur,ScoreDiag1),
 	evalDiag2(X,Y,Joueur,ScoreDiag2),
-	max_list([ScoreLigne,ScoreCol,ScoreDiag1,ScoreDiag2], ScoreCase).
+	%write(ScoreLigne), write(" "), write(ScoreCol), write(" "), write(ScoreDiag1), write(" "), write(ScoreDiag2), write(" "),
+	%max_list([ScoreLigne,ScoreCol,ScoreDiag1,ScoreDiag2], ScoreCase).
+	sum([ScoreLigne,ScoreCol,ScoreDiag1,ScoreDiag2],ScoreCase).
 
 %% ligne
 evalLigne(X,Y,J,Score) :-
+	X > 1,
+	decr(X,X1),
+	caseVideTest(X1,Y),
+
 	gaucheVerifTest(X,Y,J,GaucheJ),
 	droiteVerifTest(X,Y,J,DroiteJ),
 	gaucheVideTest(GaucheJ,Y,J,GaucheV),
 	droiteVideTest(DroiteJ,Y,J,DroiteV),
-	DroiteV-GaucheV+1 >= 4,!,
+	DroiteV-GaucheV+1 >= 4,
 	NCaseJoueur is DroiteJ-GaucheJ+1,
-	pow(NCaseJoueur,3,Score).
+	pow(NCaseJoueur,3,Score),!.
+
+evalLigne(X,Y,J,Score) :-
+	nbColonnes(NBCOLONNES),
+	X < NBCOLONNES,
+	incr(X,X1),
+	caseVideTest(X1,Y),
+
+	gaucheVerifTest(X,Y,J,GaucheJ),
+	droiteVerifTest(X,Y,J,DroiteJ),
+	gaucheVideTest(GaucheJ,Y,J,GaucheV),
+	droiteVideTest(DroiteJ,Y,J,DroiteV),
+	DroiteV-GaucheV+1 >= 4,
+	NCaseJoueur is DroiteJ-GaucheJ+1,
+	pow(NCaseJoueur,3,Score),!.
 evalLigne(_,_,_,0).
 
 gaucheVerifTest(X,Y,J,GaucheJ) :-
@@ -196,10 +216,143 @@ basVerifTest(X,Y,J,NCaseJoueur) :-
 basVerifTest(_,_,_,0).
 
 %% diag1 (descendante)
+evalDiag1(X,Y,J,Score) :-
+	X > 1,
+	nbLignes(NBLIGNES),
+	Y < NBLIGNES,
+	decr(X,X1),
+	incr(Y,Y1),
+	caseVideTest(X1,Y1),
+
+	gaucheHautVerifTest(X,Y,J,XGaucheHautJ,YGaucheHautJ),
+	droiteBasVerifTest(X,Y,J,XDroiteBasJ,YDroiteBasJ),
+	gaucheHautVideTest(XGaucheHautJ,YGaucheHautJ,J,XGaucheHautV,_),
+	droiteBasVideTest(XDroiteBasJ,YDroiteBasJ,J,XDroiteBasV,_),
+	XDroiteBasV-XGaucheHautV+1 >= 4,
+	NCaseJoueur is XDroiteBasJ-XGaucheHautJ+1,
+	pow(NCaseJoueur,3,Score),!.
+evalDiag1(X,Y,J,Score) :-
+	nbColonnes(NBCOLONNES),
+	X < NBCOLONNES,
+	Y > 1,
+	incr(X,X1),
+	decr(Y,Y1),
+	caseVideTest(X1,Y1),
+
+	gaucheHautVerifTest(X,Y,J,XGaucheHautJ,YGaucheHautJ),
+	droiteBasVerifTest(X,Y,J,XDroiteBasJ,YDroiteBasJ),
+	gaucheHautVideTest(XGaucheHautJ,YGaucheHautJ,J,XGaucheHautV,_),
+	droiteBasVideTest(XDroiteBasJ,YDroiteBasJ,J,XDroiteBasV,_),
+	XDroiteBasV-XGaucheHautV+1 >= 4,
+	NCaseJoueur is XDroiteBasJ-XGaucheHautJ+1,
+	pow(NCaseJoueur,3,Score),!.
 evalDiag1(_,_,_,0).
 
+gaucheHautVerifTest(X,Y,J,XGaucheHautJ,YGaucheHautJ) :-
+	decr(X,X1),
+	incr(Y,Y1),
+	caseTest(X1,Y1,J),!,
+	gaucheHautVerifTest(X1,Y1,J,XGaucheHautJ,YGaucheHautJ).
+gaucheHautVerifTest(X,Y,_,X,Y).
+
+droiteBasVerifTest(X,Y,J,XDroiteBasJ,YDroiteBasJ) :-
+	incr(X,X1),
+	decr(Y,Y1),
+	caseTest(X1,Y1,J),!,
+	droiteBasVerifTest(X1,Y1,J,XDroiteBasJ,YDroiteBasJ).
+droiteBasVerifTest(X,Y,_,X,Y).
+
+gaucheHautVideTest(X,Y,J,XGaucheHautV,YGaucheHautV) :-
+	X > 1,
+	nbLignes(NBLIGNES),
+	Y < NBLIGNES,
+	decr(X,X1),
+	incr(Y,Y1),
+	caseVideTest(X1,Y1),!,
+	gaucheHautVideTest(X1,Y1,J,XGaucheHautV,YGaucheHautV).
+gaucheHautVideTest(X,Y,_,X,Y).
+
+droiteBasVideTest(X,Y,J,XDroiteBasV,YDroiteBasV) :-
+	nbColonnes(NBCOLONNES),
+	X < NBCOLONNES,
+	Y > 1,
+	incr(X,X1),
+	decr(Y,Y1),
+	caseVideTest(X1,Y1),!,
+	droiteBasVideTest(X1,Y1,J,XDroiteBasV,YDroiteBasV).
+droiteBasVideTest(X,Y,_,X,Y).
+
 %% diag2 (montante)
+evalDiag2(X,Y,J,Score) :-
+	X > 1,
+	Y > 1,
+	decr(X,X1),
+	decr(Y,Y1),
+	caseVideTest(X1,Y1),
+
+	gaucheBasVerifTest(X,Y,J,XGaucheBasJ,YGaucheBasJ),
+	droiteHautVerifTest(X,Y,J,XDroiteHautJ,YDroiteHautJ),
+	gaucheBasVideTest(XGaucheBasJ,YGaucheBasJ,J,XGaucheBasV,_),
+	droiteHautVideTest(XDroiteHautJ,YDroiteHautJ,J,XDroiteHautV,_),
+	XDroiteHautV-XGaucheBasV+1 >= 4,
+	NCaseJoueur is XDroiteHautJ-XGaucheBasJ+1,
+	pow(NCaseJoueur,3,Score),!.
+evalDiag2(X,Y,J,Score) :-
+	nbColonnes(NBCOLONNES),
+	X < NBCOLONNES,
+	nbLignes(NBLIGNES),
+	Y < NBLIGNES,
+	incr(X,X1),
+	incr(Y,Y1),
+	caseVideTest(X1,Y1),
+
+	gaucheBasVerifTest(X,Y,J,XGaucheBasJ,YGaucheBasJ),
+	droiteHautVerifTest(X,Y,J,XDroiteHautJ,YDroiteHautJ),
+	gaucheBasVideTest(XGaucheBasJ,YGaucheBasJ,J,XGaucheBasV,_),
+	droiteHautVideTest(XDroiteHautJ,YDroiteHautJ,J,XDroiteHautV,_),
+	XDroiteHautV-XGaucheBasV+1 >= 4,
+	NCaseJoueur is XDroiteHautJ-XGaucheBasJ+1,
+	pow(NCaseJoueur,3,Score),!.
 evalDiag2(_,_,_,0).
+
+gaucheBasVerifTest(X,Y,J,XGaucheBasJ,YGaucheBasJ) :-
+	decr(X,X1),
+	decr(Y,Y1),
+	caseTest(X1,Y1,J),!,
+	gaucheBasVerifTest(X1,Y1,J,XGaucheBasJ,YGaucheBasJ).
+gaucheBasVerifTest(X,Y,_,X,Y).
+
+droiteHautVerifTest(X,Y,J,XDroiteHautJ,YDroiteHautJ) :-
+	incr(X,X1),
+	incr(Y,Y1),
+	caseTest(X1,Y1,J),!,
+	droiteHautVerifTest(X1,Y1,J,XDroiteHautJ,YDroiteHautJ).
+droiteHautVerifTest(X,Y,_,X,Y).
+
+gaucheBasVideTest(X,Y,J,XGaucheBasV,YGaucheBasV) :-
+	X > 1,
+	Y > 1,
+	decr(X,X1),
+	decr(Y,Y1),
+	caseVideTest(X1,Y1),!,
+	gaucheBasVideTest(X1,Y1,J,XGaucheBasV,YGaucheBasV).
+gaucheBasVideTest(X,Y,_,X,Y).
+
+droiteHautVideTest(X,Y,J,XDroiteHautV,YDroiteHautV) :-
+	nbColonnes(NBCOLONNES),
+	X < NBCOLONNES,
+	nbLignes(NBLIGNES),
+	Y < NBLIGNES,
+	incr(X,X1),
+	incr(Y,Y1),
+	caseVideTest(X1,Y1),!,
+	droiteHautVideTest(X1,Y1,J,XDroiteHautV,YDroiteHautV).
+droiteHautVideTest(X,Y,_,X,Y).
+
+
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %			HEURISTIQUE PAR ADJACENCE % ça marche peut-être (cf. Flo)
