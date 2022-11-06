@@ -355,7 +355,7 @@ droiteHautVideTest(X,Y,_,X,Y).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%			HEURISTIQUE PAR ADJACENCE % ça marche peut-être (cf. Flo)
+%			HEURISTIQUE PAR ADJACENCE % ça marche peut-être (cf. Flo) --> bien reçu 👍
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -378,7 +378,7 @@ caseAdjacente(X,Y,Joueur,Xadj,Yadj) :-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%			HEURISTIQUE PAR DENSITE DE PION
+%			HEURISTIQUE PAR DENSITE DE PION % euh c'est quoi la diff entre les heuristiques de densité et d'adjacence svp 👀
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
