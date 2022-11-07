@@ -23,7 +23,6 @@
 % Score s'unifie avec le score évalué pour la position courante.
 evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
 	%write("X: "),write(X),write(" Y: "),write(Y),write(" "),
-	assert(caseTest(X,Y,JoueurCourant)),
 	assert(ennemiTest(AutreJoueur)),
 	poidsPuissance3(PoidsPuissance3), poidsPosition(PoidsPosition), poidsDensite(PoidsDensite), poidsAdjacence(PoidsAdjacence), poidsAlea(PoidsAlea), poidsTest(PoidsTest), poidsConf(PoidsConf),
 	evalPosition(JoueurCourant,Score1,PoidsPosition),
@@ -33,7 +32,6 @@ evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
 	evalTest(JoueurCourant,AutreJoueur,Score5,PoidsTest),
 	evalConf(JoueurCourant,AutreJoueur,Score6,PoidsConf),
 	%write("Position: "),write(Score1),write(" Puissance3: "),write(Score2),write(" Densite: "),write(Score3),write(" Adjacence: "),write(Score4),write(" Test: "),write(Score5),write(" Conf: "),write(Score6), nl,
-	retract(caseTest(X,Y,JoueurCourant)),
 	retract(ennemiTest(AutreJoueur)),
 	random_between(-2,2,Perturbation),
 	Score is Score1 * PoidsPosition
@@ -385,7 +383,8 @@ evalConfLigne(Joueur,Score) :-
 	between(1,Xmax,X), between(1,NBLIGNES,Y),
 	%write(" X: "), write(X), write(" Y: "), write(Y),
 	nombreCasesJoueurConf(X,Y,Joueur,1,0,4,NombreCases),
-	pow(NombreCases,2,Score).%, write(" "), write(Score).
+	decr(NombreCases,Coeff),
+	pow(5,Coeff,Score).%, write(" "), write(Score).
 
 evalConfCol(Joueur,Score) :-
 	nbColonnes(NBCOLONNES), nbLignes(NBLIGNES),
@@ -393,7 +392,8 @@ evalConfCol(Joueur,Score) :-
 	between(1,NBCOLONNES,X), between(1,Ymax,Y),
 	%write(" X: "), write(X), write(" Y: "), write(Y),
 	nombreCasesJoueurConf(X,Y,Joueur,0,1,4,NombreCases),
-	pow(NombreCases,2,Score).%, write(" "), write(Score).
+	decr(NombreCases,Coeff),
+	pow(5,Coeff,Score).%, write(" "), write(Score).
 
 evalConfDiag1(Joueur,Score) :-
 	nbColonnes(NBCOLONNES), nbLignes(NBLIGNES),
@@ -401,7 +401,8 @@ evalConfDiag1(Joueur,Score) :-
 	between(1,Xmax,X), between(4,NBLIGNES,Y),
 	%write(" X: "), write(X), write(" Y: "), write(Y),
 	nombreCasesJoueurConf(X,Y,Joueur,1,-1,4,NombreCases),
-	pow(NombreCases,2,Score).%, write(" "), write(Score).
+	decr(NombreCases,Coeff),
+	pow(5,Coeff,Score).%, write(" "), write(Score).
 
 evalConfDiag2(Joueur,Score) :-
 	nbColonnes(NBCOLONNES), nbLignes(NBLIGNES),
@@ -410,18 +411,19 @@ evalConfDiag2(Joueur,Score) :-
 	between(1,Xmax,X), between(1,Ymax,Y),
 	%write(" X: "), write(X), write(" Y: "), write(Y),
 	nombreCasesJoueurConf(X,Y,Joueur,1,1,4,NombreCases),
-	pow(NombreCases,2,Score).%, write(" "), write(Score).
+	decr(NombreCases,Coeff),
+	pow(5,Coeff,Score).%, write(" "), write(Score).
 
-% nombreCasesJoueurConf/7(+X,+Y,+Joeur,+DX,+DY,+TailleConf,-NombreCases)
+% nombreCasesJoueurConf/7(+X,+Y,+Joueur,+DX,+DY,+TailleConf,-NombreCases)
+%nombreCasesJoueurConf(_,_,Joueur,_,_,0,1) :- ennemiTest(Joueur),!.
 nombreCasesJoueurConf(_,_,_,_,_,0,0) :- !.
-nombreCasesJoueurConf(_,_,Joueur,_,_,0,1) :- ennemiTest(Joueur),!.
 nombreCasesJoueurConf(X,Y,Joueur,DX,DY,TailleConf,NombreCases) :-
 	caseTest(X,Y,Joueur), !,
 	X1 is X + DX,
 	Y1 is Y + DY,
 	decr(TailleConf,T1),
 	nombreCasesJoueurConf(X1,Y1,Joueur,DX,DY,T1,N1),
-	incr(N1,NombreCases).
+	incr(N1,NombreCases).%,write(X),write(Y),write(Joueur).
 nombreCasesJoueurConf(X,Y,Joueur,DX,DY,TailleConf,NombreCases) :-
 	caseVideTest(X,Y), !,
 	X1 is X + DX,
