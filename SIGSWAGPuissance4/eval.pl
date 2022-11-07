@@ -414,6 +414,7 @@ evalConfDiag2(Joueur,Score) :-
 
 % nombreCasesJoueurConf/7(+X,+Y,+Joeur,+DX,+DY,+TailleConf,-NombreCases)
 nombreCasesJoueurConf(_,_,_,_,_,0,0) :- !.
+nombreCasesJoueurConf(_,_,Joueur,_,_,0,1) :- ennemiTest(Joueur),!.
 nombreCasesJoueurConf(X,Y,Joueur,DX,DY,TailleConf,NombreCases) :-
 	caseTest(X,Y,Joueur), !,
 	X1 is X + DX,
