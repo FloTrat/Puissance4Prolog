@@ -4,13 +4,14 @@
 % - "Minimax", implémentation de minimax assez paramétrable.
 
 :- module(ia, [iaAleatoire/1
-			  ,iaMinimax/9
+			  ,iaMinimax/10
 			  ,poidsPuissance3/1
 			  ,poidsPosition/1
 			  ,poidsDensite/1
 			  ,poidsAdjacence/1
 			  ,poidsAlea/1
-			  ,poidsTest/1]
+			  ,poidsTest/1
+			  ,poidsConf/1]
 ).
 
 %%%%%%%%%%%%%%%%
@@ -31,6 +32,7 @@
 :- dynamic poidsAdjacence/1.
 :- dynamic poidsAlea/1.
 :- dynamic poidsTest/1.
+:- dynamic poidsConf/1.
 
 %%%%%%%%%%%%%%%%%%%%%%%
 %% Prédicats publics %%
@@ -44,17 +46,19 @@ iaAleatoire(Coup) :-
 iaAleatoire(Coup) :-
 	iaAleatoire(Coup).
 
-iaMinimax(JoueurCourant,Coup,Profondeur,PoidsPosition,PoidsPuissance3,PoidsDensite,PoidsAdjacence,Alea,PoidsTest) :-
+iaMinimax(JoueurCourant,Coup,Profondeur,PoidsPosition,PoidsPuissance3,PoidsDensite,PoidsAdjacence,Alea,PoidsTest,PoidsConf) :-
 	assert(poidsPosition(PoidsPosition)),
 	assert(poidsPuissance3(PoidsPuissance3)),
 	assert(poidsDensite(PoidsDensite)),
 	assert(poidsAdjacence(PoidsAdjacence)),
 	assert(poidsAlea(Alea)),
 	assert(poidsTest(PoidsTest)),
+	assert(poidsConf(PoidsConf)),
 	parcoursArbre(JoueurCourant,Profondeur,Coup,_),
 	retract(poidsPosition(PoidsPosition)),
 	retract(poidsPuissance3(PoidsPuissance3)),
 	retract(poidsDensite(PoidsDensite)),
 	retract(poidsAdjacence(PoidsAdjacence)),
 	retract(poidsAlea(Alea)),
-	retract(poidsTest(PoidsTest)).
+	retract(poidsTest(PoidsTest)),
+	retract(poidsConf(PoidsConf)).

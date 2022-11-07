@@ -40,6 +40,9 @@ typeJoueur(6,'IA Minimax 4 - eval Position+Puissance3').
 typeJoueur(7,'IA Minimax 5 - eval Position').
 typeJoueur(8,'IA Minimax 5 - eval Position+Puissance3').
 typeJoueur(9,'IA Minimax test - eval tests').
+typeJoueur(10,'IA Minimax 3 - eval Configuration').
+typeJoueur(11,'IA Minimax 4 - eval Configuration').
+typeJoueur(12,'IA Minimax 5 - eval Configuration').
 
 changerJoueur :-
 	joueurCourant(rouge,TypeJoueurR),
