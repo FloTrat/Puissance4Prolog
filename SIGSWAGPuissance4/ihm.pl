@@ -81,8 +81,8 @@ afficherLigne(X,Y) :-
 	between(1,NbColonnes,X),
 	afficherCase(X,Y).
 
-afficherCase(X,Y) :- case(X,Y,rouge), write("\033[31m"), write(r), write("\033[0m"),!.
-afficherCase(X,Y) :- case(X,Y,jaune), write("\033[33m"), write(j), write("\033[0m"),!.
+afficherCase(X,Y) :- case(X,Y,rouge), write("\033[31m"), write(o), write("\033[0m"),!.
+afficherCase(X,Y) :- case(X,Y,jaune), write("\033[33m"), write(x), write("\033[0m"),!.
 afficherCase(_,_) :- write(.).
 
 saisirCoup(Coup) :-

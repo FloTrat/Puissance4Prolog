@@ -22,15 +22,17 @@
 % Évalue la situation courante pour le joueur JoueurCourant étant donné que le dernier coup joué fut joué en (X,Y). Le score est pondéré par les différentes pondérations données en entrée (par assert) à evalJeu. Le score est ensuite perturbé par une valeur aléatoire, permettant de casser le caractère déterministe de l'IA.
 % Score s'unifie avec le score évalué pour la position courante.
 evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
+	%write("X: "),write(X),write(" Y: "),write(Y),write(" "),
 	assert(caseTest(X,Y,JoueurCourant)),
 	assert(ennemiTest(AutreJoueur)),
-	poidsPuissance3(PoidsPuissance3), poidsPosition(PoidsPosition), poidsDensite(PoidsDensite), poidsAdjacence(PoidsAdjacence), poidsAlea(PoidsAlea), poidsTest(PoidsTest),
+	poidsPuissance3(PoidsPuissance3), poidsPosition(PoidsPosition), poidsDensite(PoidsDensite), poidsAdjacence(PoidsAdjacence), poidsAlea(PoidsAlea), poidsTest(PoidsTest), poidsConf(PoidsConf),
 	evalPosition(JoueurCourant,Score1,PoidsPosition),
 	evalPuissances3(JoueurCourant,AutreJoueur,Score2,PoidsPuissance3),
 	densite(JoueurCourant,Score3,PoidsDensite),
 	evalAdjacence(X,Y,JoueurCourant,Score4, PoidsAdjacence),
 	evalTest(JoueurCourant,AutreJoueur,Score5,PoidsTest),
-	%write("Position: "),write(Score1),write(" Puissance3: "),write(Score2),write(" Densite: "),write(Score3),write(" Adjacence: "),write(Score4),write(" Test: "),write(Score5), nl,
+	evalConf(JoueurCourant,AutreJoueur,Score6,PoidsConf),
+	%write("Position: "),write(Score1),write(" Puissance3: "),write(Score2),write(" Densite: "),write(Score3),write(" Adjacence: "),write(Score4),write(" Test: "),write(Score5),write(" Conf: "),write(Score6), nl,
 	retract(caseTest(X,Y,JoueurCourant)),
 	retract(ennemiTest(AutreJoueur)),
 	random_between(-2,2,Perturbation),
@@ -39,6 +41,7 @@ evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
 			+ Score3 * PoidsDensite
 			+ Score4 * PoidsAdjacence
 			+ Score5 * PoidsTest
+			+ Score6 * PoidsConf
 			+ Perturbation * PoidsAlea. %bruit
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -119,7 +122,7 @@ evalCasesVides(Joueur,ScoreCase) :-
 %			HEURISTIQUE EN COURS DE TEST
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% evalTest/3(+JoueurCourant,+AutreJoueur,-Score)
+% evalTest/4(+JoueurCourant,+AutreJoueur,-Score)
 % Évalue en cherchant les positions faisant gagner.
 % ScoreFinal s'unifie au score de la position.
 evalTest(JoueurCourant,AutreJoueur,ScoreFinal,PoidsTest) :-
@@ -186,7 +189,8 @@ droiteVerifTest(X,_,_,X).
 gaucheVideTest(X,Y,J,GaucheV) :-
 	X > 1,
 	decr(X,X1),
-	caseVideTest(X1,Y),!,
+	%caseVideTest(X1,Y),!,
+	ennemiTest(Ennemi),not(caseTest(X1,Y,Ennemi)),!,
 	gaucheVideTest(X1,Y,J,GaucheV).
 gaucheVideTest(X,_,_,X).
 
@@ -194,7 +198,8 @@ droiteVideTest(X,Y,J,DroiteV) :-
 	nbColonnes(NBCOLONNES),
 	X < NBCOLONNES,
 	incr(X,X1),
-	caseVideTest(X1,Y),!,
+	%caseVideTest(X1,Y),!,
+	ennemiTest(Ennemi),not(caseTest(X1,Y,Ennemi)),!,
 	droiteVideTest(X1,Y,J,DroiteV).
 droiteVideTest(X,_,_,X).
 
@@ -351,11 +356,84 @@ droiteHautVideTest(X,Y,_,X,Y).
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%			HEURISTIQUE EN COURS DE TEST - CONFIGURATIONS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% evalConf/4(+JoueurCourant,+AutreJoueur,-Score)
+% Évalue en cherchant les positions faisant gagner.
+% ScoreFinal s'unifie au score de la position.
+evalConf(JoueurCourant,AutreJoueur,ScoreFinal,PoidsConf) :-
+	PoidsConf>0,
+	findall(S,evalConfLigne(JoueurCourant,S),ScoresCourantLigne), sum(ScoresCourantLigne,ScoreCourantLigne),
+	findall(S,evalConfCol(JoueurCourant,S),ScoresCourantCol), sum(ScoresCourantCol,ScoreCourantCol),
+	findall(S,evalConfDiag1(JoueurCourant,S),ScoresCourantDiag1), sum(ScoresCourantDiag1,ScoreCourantDiag1),
+	findall(S,evalConfDiag2(JoueurCourant,S),ScoresCourantDiag2), sum(ScoresCourantDiag2,ScoreCourantDiag2),
+	ScoreCourant is ScoreCourantLigne + ScoreCourantCol + ScoreCourantDiag1 + ScoreCourantDiag2,
+	findall(S,evalConfLigne(AutreJoueur,S),ScoresAutreLigne), sum(ScoresAutreLigne,ScoreAutreLigne),
+	findall(S,evalConfCol(AutreJoueur,S),ScoresAutreCol), sum(ScoresAutreCol,ScoreAutreCol),
+	findall(S,evalConfDiag1(AutreJoueur,S),ScoresAutreDiag1), sum(ScoresAutreDiag1,ScoreAutreDiag1),
+	findall(S,evalConfDiag2(AutreJoueur,S),ScoresAutreDiag2), sum(ScoresAutreDiag2,ScoreAutreDiag2),
+	ScoreAutre is ScoreAutreLigne + ScoreAutreCol + ScoreAutreDiag1 + ScoreAutreDiag2,
+	ScoreFinal is ScoreCourant - ScoreAutre
+	.%,write(ScoreCourant), write(" "), write(ScoreAutre), write(" "), write(ScoreFinal), nl.
+evalConf(_,_,0,_).
+
+evalConfLigne(Joueur,Score) :-
+	nbColonnes(NBCOLONNES), nbLignes(NBLIGNES),
+	Xmax is NBCOLONNES-3,
+	between(1,Xmax,X), between(1,NBLIGNES,Y),
+	%write(" X: "), write(X), write(" Y: "), write(Y),
+	nombreCasesJoueurConf(X,Y,Joueur,1,0,4,NombreCases),
+	pow(NombreCases,2,Score).%, write(" "), write(Score).
+
+evalConfCol(Joueur,Score) :-
+	nbColonnes(NBCOLONNES), nbLignes(NBLIGNES),
+	Ymax is NBLIGNES-3,
+	between(1,NBCOLONNES,X), between(1,Ymax,Y),
+	%write(" X: "), write(X), write(" Y: "), write(Y),
+	nombreCasesJoueurConf(X,Y,Joueur,0,1,4,NombreCases),
+	pow(NombreCases,2,Score).%, write(" "), write(Score).
+
+evalConfDiag1(Joueur,Score) :-
+	nbColonnes(NBCOLONNES), nbLignes(NBLIGNES),
+	Xmax is NBCOLONNES-3,
+	between(1,Xmax,X), between(4,NBLIGNES,Y),
+	%write(" X: "), write(X), write(" Y: "), write(Y),
+	nombreCasesJoueurConf(X,Y,Joueur,1,-1,4,NombreCases),
+	pow(NombreCases,2,Score).%, write(" "), write(Score).
+
+evalConfDiag2(Joueur,Score) :-
+	nbColonnes(NBCOLONNES), nbLignes(NBLIGNES),
+	Xmax is NBCOLONNES-3,
+	Ymax is NBLIGNES-3,
+	between(1,Xmax,X), between(1,Ymax,Y),
+	%write(" X: "), write(X), write(" Y: "), write(Y),
+	nombreCasesJoueurConf(X,Y,Joueur,1,1,4,NombreCases),
+	pow(NombreCases,2,Score).%, write(" "), write(Score).
+
+% nombreCasesJoueurConf/7(+X,+Y,+Joeur,+DX,+DY,+TailleConf,-NombreCases)
+nombreCasesJoueurConf(_,_,_,_,_,0,0) :- !.
+nombreCasesJoueurConf(_,_,Joueur,_,_,0,1) :- ennemiTest(Joueur),!.
+nombreCasesJoueurConf(X,Y,Joueur,DX,DY,TailleConf,NombreCases) :-
+	caseTest(X,Y,Joueur), !,
+	X1 is X + DX,
+	Y1 is Y + DY,
+	decr(TailleConf,T1),
+	nombreCasesJoueurConf(X1,Y1,Joueur,DX,DY,T1,N1),
+	incr(N1,NombreCases).
+nombreCasesJoueurConf(X,Y,Joueur,DX,DY,TailleConf,NombreCases) :-
+	caseVideTest(X,Y), !,
+	X1 is X + DX,
+	Y1 is Y + DY,
+	decr(TailleConf,T1),
+	nombreCasesJoueurConf(X1,Y1,Joueur,DX,DY,T1,NombreCases).
+nombreCasesJoueurConf(X,Y,_,_,_,_,_) :-
+	ennemiTest(Ennemi),caseTest(X,Y,Ennemi), !, false.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%			HEURISTIQUE PAR ADJACENCE % ça marche peut-être (cf. Flo)
+%			HEURISTIQUE PAR ADJACENCE % ça marche peut-être (cf. Flo) --> bien reçu 👍
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -378,7 +456,7 @@ caseAdjacente(X,Y,Joueur,Xadj,Yadj) :-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%			HEURISTIQUE PAR DENSITE DE PION
+%			HEURISTIQUE PAR DENSITE DE PION % euh c'est quoi la diff entre les heuristiques de densité et d'adjacence svp 👀
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

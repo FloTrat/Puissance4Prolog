@@ -31,6 +31,7 @@ parcoursArbre(J,Pmax,R,Value) :-
 	setJoueur(1), AlphaNext2 is max(AlphaNext1,X4), parcours(5,1,Pmax,[5,0],InfP,AlphaNext2), feuille([5,0],X5),
 	setJoueur(1), AlphaNext3 is max(AlphaNext2,X5), parcours(6,1,Pmax,[6,0],InfP,AlphaNext3), feuille([6,0],X6),
 	setJoueur(1), AlphaNext4 is max(AlphaNext3,X6), parcours(7,1,Pmax,[7,0],InfP,AlphaNext4), feuille([7,0],X7),
+	%write(X1),write(" "),write(X2),write(" "),write(X3),write(" "),write(X4),write(" "),write(X5),write(" "),write(X6),write(" "),write(X7),nl,
 	coupAJouerMaximizer([X1,X2,X3,X4,X5,X6,X7],R,Value), clearTest,!. % the second call and the next ones are called with the result of the preceding (we take the max of all of them) on reset le joueur entre chaque call
 
 
@@ -46,6 +47,7 @@ clearTest :-
 	retractall(feuille(X,Y)),
 	retract(maximizer(X)), retract(joueurCourant(_)). % on eve tout ce que l'on a ajouté.
 
+% parcours/6(+X, +Profondeur, +ProfondeurMax, +???, +Alpha, +Beta)
 parcours(X, _, _, L, _, _) :-
 	nbLignes(MaxLignes),case(X,MaxLignes,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,Value), assert(feuille(L, Value)). % on ne peut PAS jouer, on met -infini
 parcours(X, _, _, L, _, _):-
@@ -241,9 +243,9 @@ gagneTest(X,Y,J,V) :- %V=1 si victoire direct, 0 si indirect
 	gagneLigneTest(X,Y,J,R2,P2,A2),
 	gagneDiag1Test(X,Y,J,R3,P3,A3),
 	gagneDiag2Test(X,Y,J,R4,P4,A4),
-	Pf is P2+P3+P4,
-	Af is A1+A2+A3+A4,
-	testFinal(R1,R2,R3,R4,Pf,Af,V),
+	Pf is P2+P3+P4, % cases adjacentes vides jouables autour des lignes du joueur (de 0 à 6) - case vide au dessus (colonne) exclue
+	Af is A1+A2+A3+A4, % lorsque case vide jouable, indique si la case du dessus est aussi gagnante (de 0 à 7)
+	testFinal(R1,R2,R3,R4,Pf,Af,V), % V s'unifie à 1 si directement gagnant, 0 si au moins 2 cases adj vides jouables gagnantes (ie gagnant au prochain tour), -5 si au moins 1 accumulation (ie gagnant au prochain tour aussi) (faux dans les autres cas)
 	retract(caseTest(X,Y,J)).
 
 gagneTest(X,Y,J,0):-retract(caseTest(X,Y,J)), false. %ménage
@@ -304,6 +306,7 @@ gagneColonneTest(_,_,_,0,0).
 
 %%% En ligne %%%
 
+% (+X,+Y,+J,-NCaseAdjJoueur,-IsCasesVidesAdjJouables,-IsCasesVidesAdjGagnantes)
 gagneLigneTest(X,Y,J,Rf,Pf,Af) :-
 	decr(X,X1),
 	gaucheTestVerif(X1,Y,J,Rg,Pg,Ag),
@@ -312,12 +315,13 @@ gagneLigneTest(X,Y,J,Rf,Pf,Af) :-
 	!,
 	Rf is Rg+Rd, Pf is Pg+Pd, Af is Ag+Ad.
 
+% (+X,+Y,+J,-NCaseAdjGaucheJoueur,-IsCaseVideGaucheJouable,-IsCaseVideGaucheGagnante)
 gaucheTestVerif(X,Y,J,Rg,Pg,Ag):-
 	gaucheTest(X,Y,J,0,Rg,Pg,Ag).
 gaucheTest(X,Y,J,R,R,Pg,Ag):-
 	caseTestValideVide(X,Y),	%case dans le tableau et vide
 	gagneTestDirectLigne(X,Y,J),	%gagnante
-	testPotentielAccumulation(X,Y,J,Pg,Ag).		%Peut on la placer et a-t-on accumulation?
+	testPotentielAccumulation(X,Y,J,Pg,Ag).		%Peut on la placer et a-t-on accumulation? (case X/Y est jouable directement (Pg=1) et case du dessus/dessous permet de ganger directement (Ag=1))
 gaucheTest(X,Y,J,R,R,0,0) :-
 	not(caseTest(X,Y,J)). %Jusqu'à la caseTest non J
 gaucheTest(X,Y,J,R,Rg,Pg,Ag) :-
