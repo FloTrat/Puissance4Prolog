@@ -1,5 +1,6 @@
 # PrologPuissance4
-Projet Prolog - Jeu du puissance 4   
+Projet Prolog - Jeu du puissance 4
+Le socle du projet est nommé SIGSWAGPuissance4 et réalisé par un groupe d'INSAliens en 2015 : https://github.com/SIGSWAG/PrologPuissance4 à savoir Marc JAVIN et Loïc TOUZARD.
 
 
 ## Jouer à Puissance 4  
