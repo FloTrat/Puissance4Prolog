@@ -9,7 +9,6 @@
 :- use_module(ia).
 :- use_module(eval).
 :- use_module(miniMax).
-:- use_module(util).
 
 :- ['websimulate.pl'].
 
@@ -27,20 +26,27 @@
 % On cherche à évaluer le nbr de coups moyen qu'il a fallu pour gagner
 runTest(NbIterations,IA1,IA2) :-
 	NbIterationsParIA is NbIterations//2,
-	runTestIAXEnPremier(NbIterationsParIA,IA1,IA2,0,NbFoisIA1GagneEnCommencant,0,NbFoisIA1PerdEnCommencant,NCoupIA1P1,NCoupIA2P1),
-	afficheKmoy(NCoupIA1P1,NCoupIA2P1, NbIterationsParIA),
-	runTestIAXEnPremier(NbIterationsParIA,IA2,IA1,0,NbFoisIA2GagneEnCommencant,0,NbFoisIA2PerdEnCommencant,NCoupIA1P2,NCoupIA2P2),
-	afficheKmoy(NCoupIA1P2,NCoupIA2P2, NbIterationsParIA),
 	typeJoueur(IA1,TypeIA1),
 	typeJoueur(IA2,TypeIA2),
+	runTestIAXEnPremier(NbIterationsParIA,IA1,IA2,0,NbFoisIA1GagneEnCommencant,0,NbFoisIA1PerdEnCommencant,NCoupIA1P1,NCoupIA2P1),
+	write("Stats sur "),write(NbIterationsParIA),write(" parties où IA1 ("),write(TypeIA1),write(") commence: "),nl,
+	IA1MoyP1 is NCoupIA1P1/NbIterationsParIA,
+	IA2MoyP1 is NCoupIA2P1/NbIterationsParIA,
+	write("	IA1 - Nombre moyen de coups joués par partie: "),write(IA1MoyP1),nl,
+	write("	IA2 - Nombre moyen de coups joués par partie: "),write(IA2MoyP1),nl,
+	write("	IA1vsIA2 - Victoires/Défaites: "),write(NbFoisIA1GagneEnCommencant),write("/"),write(NbFoisIA1PerdEnCommencant),nl,
+	runTestIAXEnPremier(NbIterationsParIA,IA2,IA1,0,NbFoisIA2GagneEnCommencant,0,NbFoisIA2PerdEnCommencant,NCoupIA1P2,NCoupIA2P2),
+	write("Stats sur "),write(NbIterationsParIA),write(" parties où IA2 ("),write(TypeIA2),write(") commence: "),nl,
+	IA1MoyP2 is NCoupIA1P2/NbIterationsParIA,
+	IA2MoyP2 is NCoupIA2P2/NbIterationsParIA,
+	write("	IA1 - Nombre moyen de coups joués par partie: "),write(IA1MoyP2),nl,
+	write("	IA2 - Nombre moyen de coups joués par partie: "),write(IA2MoyP2),nl,
+	write("	IA1vsIA2 - Victoires/Défaites: "),write(NbFoisIA2PerdEnCommencant),write("/"),write(NbFoisIA2GagneEnCommencant),nl,
 	%assert(statsIA1(Dict1.get(wall), Dict1.get(inferences), Dict2.get(wall), Dict2.get(inferences))),
 	% STATS_IA1 = {TEMPS_SI_IA1_COMMENCE, NB_ITERATIONS_SI_IA1_COMMENCE, TEMPS_SI_IA1_NE_COMMENCE_PAS, NB_ITERATIONS_SI_IA1_NE_COMMENCE_PAS}
 
 	%assert(statsIA2(Dict2.get(wall), Dict2.get(inferences), STATS_IA1(Dict2.get(wall), Dict1.get(inferences)))),
 	% STATS_IA2 = {TEMPS_SI_IA2_COMMENCE, NB_ITERATIONS_SI_IA2_COMMENCE, TEMPS_SI_IA2_NE_COMMENCE_PAS, NB_ITERATIONS_SI_IA2_NE_COMMENCE_PAS}
-	write(TypeIA2), write(' (jaune) en commençant : a gagné '), write(NbFoisIA2GagneEnCommencant),write(' fois et a perdu '),write(NbFoisIA2PerdEnCommencant),write(' fois.'),
-	nl,
-	write(TypeIA1), write(' (rouge) en commençant : a gagné '), write(NbFoisIA1GagneEnCommencant),write(' fois et a perdu '),write(NbFoisIA1PerdEnCommencant),write(' fois.'),
 	statistics,
 	!.
 
@@ -70,15 +76,8 @@ benchmark(NbIterations, IA1, IA2) :-
 %calculTmpMoy(IA, NbIterations) :-
 
 
-%calculKMoy(IA, NbIterations) :- 
-% joueurCourant(rouge, IA),
-% ia1Coups(S), NbParties is NbIterations,  write('S : '), write(S), write('NBParties : '), write(NbParties), M is (S / NbParties), write('||'),  write('KMoy pour '), write(IA), write(' : '), write(M), write('\n').
-afficheKmoy(NCoupIA1,NCoupIA2, NbIterations) :- 
- write('S : '), write(NCoupIA1), write('NBParties : '), write(NbIterations), M1 is (NCoupIA1 / NbIterations), write('||'),  write('KMoy pour IA1 '), write(' : '), write(M1), nl,
- write('S : '), write(NCoupIA2), write('NBParties : '), write(NbIterations), M2 is (NCoupIA2 / NbIterations), write('||'),  write('KMoy pour IA2 '), write(' : '), write(M2), nl.
-
 % test de sortie de runTestIAXEnPremier
-runTestIAXEnPremier(0,_,_,NbIA1GagneIni,NbIA1GagneIni,NbIA2GagneIni,NbIA2GagneIni,0,0) :- !.
+runTestIAXEnPremier(0,_,_,NbIA1GagneIni,NbIA1GagneIni,NbIA2GagneIni,NbIA2GagneIni,0,0).
 
 runTestIAXEnPremier(NbIterations,IA1,IA2,NbIA1GagneIni,NbIA1GagneFin,NbIA2GagneIni,NbIA2GagneFin,NCoupIA1,NCoupIA2) :-
 	init,

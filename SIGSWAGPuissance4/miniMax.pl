@@ -86,7 +86,7 @@ parcoursNew(X,P,BestScore) :-
 	bestScoreCol(NBCOLONNES,NewP,BestScore,_,0),
 	changerJoueur,
 	retract(caseTest(X,Y,J)).
-
+/*
 victoireDirecteNew(_,_,J,P,1,Value):- maximizer(J), Pp is 1-P, infinitePos(Pp,Value). %Victoire du max
 victoireDirecteNew(_,_,J,P,1,Value):- not(maximizer(J)), Pp is 1-P, infiniteNeg(Pp,Value). %Victoire du min
 
@@ -111,7 +111,7 @@ victoireDirecteNew(X,Y,J,P,-5,Value):- not(maximizer(J)), Pp is -5-P, infiniteNe
 	retract(caseTest(X,Y,J)). %Victoire anticipée du min
 
 victoireDirecteNew(X,Y,J,_,-5,_):- retract(caseTest(X,Y,J)), false. %ménage si on perde derrière
-
+*/
 
 %%%%%%%%%%%%%%%%%%%%%%
 %% Prédicats privés %%
