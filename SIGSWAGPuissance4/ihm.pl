@@ -47,9 +47,11 @@ afficherPartieNulle :-
 	nl,
 	write('Il y a egalite entre les 2 joueurs').
 
-p(X) :- read(A), q(A,X-[]).
-q(end,X-X) :- !.
-q(A,[A|X]-Y) :- read(B), q(B,X-Y).
+readEval(ListEval) :- read(X), evals(X,ListEval).
+evals(end,[]) :- !.
+evals(X,[X|ListEval]) :- read(Y), evals(Y,ListEval).
+
+empty([]).
 
 % demandeTypeDeJeu/1(-TypeDeJeu)
 % Demande à l'utilisateur de saisir un type de jeu. N'échoue pas en cas d'entrée invalide (en dehors des valeurs possibles).
@@ -57,7 +59,7 @@ q(A,[A|X]-Y) :- read(B), q(B,X-Y).
 demandeTypeDeJeu(TypeIA, TypeEval) :-
 	write('   --- Puissance 4 ---'), nl,
 	write('   --- Veuillez choisir une IA ---'), nl,
-		findall(_, afficherTypeJoueur(_,_), _),
+	findall(_, afficherTypeJoueur(_,_), _),
 	nl, nl,
 	write(' ----------------------- '), nl,
     write('Saisissez votre choix :'), nl,
@@ -70,8 +72,8 @@ demandeTypeDeJeu(TypeIA, TypeEval) :-
 		write('   --- ex: Pour choisir l''heuristique 1, entrer ''1.'' puis ''end.'' ---'), nl,
 		findall(_, afficherTypeHeuristique(_,_), _),
 		write(' ----------------------- '), nl,
-		p(TypeEval)
-	;write('')).
+		readEval(TypeEval)
+	;empty(TypeEval)).
 	
 
 %%%%%%%%%%%%%%%%%%%%%%
