@@ -1,3 +1,13 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+    %%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%   DEPRECATED   %%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
 % parcoursArbre/4(+J,+Pmax,-R,-Value)
 % Parcours l'arbre de jeu en évaluant les feuilles grâces aux différentes fonctions d'évaluation. +J : joueur devant jouer, +Pmax : profondeur maximale, -R : le coup à jouer, -Value : évaluation du noeud courant.
 parcoursArbre(J,Pmax,R,Value) :-
@@ -90,3 +100,5 @@ update_next_bound(F) :-
 	;
 	retract( next_bound(Bound) ), !, % Lower next bound
 	asserta( next_bound(F) ).
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
