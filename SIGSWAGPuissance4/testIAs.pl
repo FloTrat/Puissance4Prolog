@@ -35,7 +35,7 @@ runTest(NbIterations,IA1,IA2) :-
 	write("	IA1 - Nombre moyen de coups joués par partie: "),write(IA1MoyP1),nl,
 	write("	IA2 - Nombre moyen de coups joués par partie: "),write(IA2MoyP1),nl,
 	write("	IA1vsIA2 - Victoires/Défaites: "),write(NbFoisIA1GagneEnCommencant),write("/"),write(NbFoisIA1PerdEnCommencant),nl,
-	runTestIAXEnPremier(NbIterationsParIA,IA2,IA1,0,NbFoisIA2GagneEnCommencant,0,NbFoisIA2PerdEnCommencant,NCoupIA1P2,NCoupIA2P2),
+	runTestIAXEnPremier(NbIterationsParIA,IA2,IA1,0,NbFoisIA2GagneEnCommencant,0,NbFoisIA2PerdEnCommencant,NCoupIA2P2,NCoupIA1P2),
 	write("Stats sur "),write(NbIterationsParIA),write(" parties où IA2 ("),write(TypeIA2),write(") commence: "),nl,
 	IA1MoyP2 is NCoupIA1P2/NbIterationsParIA,
 	IA2MoyP2 is NCoupIA2P2/NbIterationsParIA,

@@ -39,12 +39,64 @@ parcoursArbre(J,Pmax,1,BestX,BestScore) :-
 	nbColonnes(NBCOLONNES),
 	bestScoreCol(NBCOLONNES,Pmax,BestScore,BestX,1),
 	%write("BestX: "), write(BestX), write(" Score: "), write(BestScore), nl,
-	clearTest,!. % the second call and the next ones are called with the result of the preceding (we take the max of all of them) on reset le joueur entre chaque call
+	clearTest,!.
 
-bestScoreCol(0,_,BestScore,0,_) :- 
+/*
+parcoursArbre(J,Pmax,2,BestX,BestScore) :-
+	initCaseTest,assert(maximizer(J)), assert(joueurCourant(J)),
+	nbColonnes(NBCOLONNES),
+	infiniteNeg(Alpha),
+	infinitePos(Beta),
+	bestScoreColAB(NBCOLONNES,Pmax,BestScore,BestX,_,_),
+	%write("BestX: "), write(BestX), write(" Score: "), write(BestScore), nl,
+	clearTest,!.
+
+bestScoreColAB(0,_,BestScore,0,_,BestScore,-BestScore) :- 
 	joueurCourant(J), maximizer(J), infiniteNeg(BestScore).
-bestScoreCol(0,_,BestScore,0,_) :- 
+bestScoreColAB(0,_,BestScore,0,_,BestScore,-BestScore) :- 
 	infinitePos(BestScore).
+bestScoreColAB(X,Pmax,BestScore,BestX,1,Alpha,Beta) :- % pour afficher le score final pour chaque colonne
+	joueurCourant(J), maximizer(J),
+	parcoursNewAB(X,Pmax,ScoreX),
+	%write("X: "),write(X),write(" Score: "),write(ScoreX),nl,
+	decr(X,X1),
+	bestScoreColAB(X1,Pmax,BestScoreX1,BestX1,1,Alpha,Beta),
+	compScore(X,ScoreX,BestX1,BestScoreX1,BestX,BestScore),
+	compAB(BestScore,).
+bestScoreColAB(X,Pmax,BestScore,BestX,1,Alpha,Beta) :- % pour afficher le score final pour chaque colonne
+	parcoursNewAB(X,Pmax,ScoreX),
+	%write("X: "),write(X),write(" Score: "),write(ScoreX),nl,
+	decr(X,X1),
+	bestScoreColAB(X1,Pmax,BestScoreX1,BestX1,1,Alpha,Beta),
+	compScore(X,ScoreX,BestX1,BestScoreX1,BestX,BestScore).
+bestScoreColAB(X,Pmax,BestScore,BestX,0,Alpha,Beta) :-
+	parcoursNewAB(X,Pmax,ScoreX),
+	%write("P: "),write(Pmax),write(" X: "),write(X),write(" Score: "),write(ScoreX),nl,
+	decr(X,X1),
+	bestScoreColAB(X1,Pmax,BestScoreX1,BestX1,0,Alpha,Beta),
+	compScore(X,ScoreX,BestX1,BestScoreX1,BestX,BestScore).
+
+parcoursNewAB(X,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,ScoreX).
+parcoursNewAB(X,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), not(maximizer(Joue)), infinitePos(2,ScoreX).
+parcoursNewAB(X,_,ScoreX) :- nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), evaluate(X,NBLIGNES,Joue,ScoreX).
+%parcoursNewAB(X, P, ScoreX):-
+%	joueurCourant(Joue), calculPositionJeton(X, 1, Y), gagneTest(X,Y,Joue,Direct), victoireDirecteNew(X,Y,Joue,P,Direct,ScoreX).
+parcoursNewAB(X,1,ScoreX) :- joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, ScoreX), retract(caseTest(X,Y,Joue)).
+parcoursNewAB(X,P,BestScore) :-
+	%write("X: "),write(X),write(" P: "),write(P),nl,
+	joueurCourant(J),
+	placerJeton(X,Y,J),
+	nbColonnes(NBCOLONNES),
+	decr(P,NewP),
+	changerJoueur,
+	bestScoreColAB(NBCOLONNES,NewP,BestScore,_,0,Alpha,Beta),
+	changerJoueur,
+	retract(caseTest(X,Y,J)).
+*/
+
+bestScoreCol(1,Pmax,BestScore,1,_) :-
+	parcoursNew(1,Pmax,BestScore).
+	%write("X: "),write(1),write(" Score: "),write(BestScore),nl,!.
 bestScoreCol(X,Pmax,BestScore,BestX,1) :- % pour afficher le score final pour chaque colonne
 	parcoursNew(X,Pmax,ScoreX),
 	%write("X: "),write(X),write(" Score: "),write(ScoreX),nl,
@@ -71,8 +123,7 @@ compScore(_,_,X1,ScoreX1,X1,ScoreX1).
 
 parcoursNew(X,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,ScoreX).
 parcoursNew(X,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), not(maximizer(Joue)), infinitePos(2,ScoreX).
-parcoursNew(X,_,ScoreX):-
-	nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), evaluate(X,NBLIGNES,Joue,ScoreX).
+parcoursNew(X,_,ScoreX) :- nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), evaluate(X,NBLIGNES,Joue,ScoreX).
 %parcoursNew(X, P, ScoreX):-
 %	joueurCourant(Joue), calculPositionJeton(X, 1, Y), gagneTest(X,Y,Joue,Direct), victoireDirecteNew(X,Y,Joue,P,Direct,ScoreX).
 parcoursNew(X,1,ScoreX) :- joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, ScoreX), retract(caseTest(X,Y,Joue)).
