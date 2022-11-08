@@ -72,7 +72,7 @@ afficherColonne(X) :-
 afficherPlateau(Y) :-
 	nbLignes(NbLignes),
 	between(1,NbLignes,Y1),
-	Y is 7-Y1,
+	Y is NbLignes+1-Y1,
 	findall(_, afficherLigne(_,Y), _),
 	nl.
 
