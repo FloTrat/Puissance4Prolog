@@ -1,5 +1,9 @@
-%%%%%%%%%%%% webserver.pl %%%%%%%%%%%%
-% Serveur web permettant d'interfacer Prolog avec notre IHM web.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Adaptation du code 'webserver.pl' %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%% websimulate.pl %%%%%%%%%%%%
+% Serveur web permettant d'interfacer Prolog avec notre IHM console.
 
 %%%%%%%%%%%%%%%%
 %% Inclusions %%
@@ -151,3 +155,5 @@ obtenirCoup(CouleurJCourant,18,Coup) :-
     iaMinimax(CouleurJCourant,Coup,2,0,0,0,0,0,0,1,1).
 obtenirCoup(CouleurJCourant,19,Coup) :-
     iaMinimax(CouleurJCourant,Coup,3,0,0,0,0,0,0,1,1).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
