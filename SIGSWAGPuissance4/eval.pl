@@ -458,7 +458,7 @@ caseAdjacente(X,Y,Joueur,Xadj,Yadj) :-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%			HEURISTIQUE PAR DENSITE DE PION % euh c'est quoi la diff entre les heuristiques de densité et d'adjacence svp 👀
+%			HEURISTIQUE PAR DENSITE DE PION %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -171,19 +171,19 @@ statutJeu(_,_,_, 'continue') :-
 % obtenirCoup/1(+CouleurJCourant,+CodeIA,-Coup)
 % Unifie à Colonne le coup joué par l'IA dont le code est CodeIA
 % CodeIA == 2 :- IA aleatoire
-obtenirCoup(_,2,Coup) :-
+obtenirCoup(_,2,TypeEvalJoueur,Coup) :-
     iaAleatoire(Coup).
 
-obtenirCoup(CouleurJCourant,3,Coup) :-
+obtenirCoup(CouleurJCourant,3,TypeEvalJoueur,Coup) :-
     % iaMinimax(JoueurCourant,Coup,Profondeur,PoidsPosition,PoidsPuissance3,PoidsDensite,PoidsAdjacence)
-    iaMinimax(CouleurJCourant,Coup,3,1,0,0,0).
-obtenirCoup(CouleurJCourant,4,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,3,1,0,0,0).
-obtenirCoup(CouleurJCourant,5,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,4,1,0,0,0).
-obtenirCoup(CouleurJCourant,6,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,4,1,1,0,0).
-obtenirCoup(CouleurJCourant,7,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,5,1,1,0,0).
-obtenirCoup(CouleurJCourant,8,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,5,1,1,0,0).
+    iaMinimax(CouleurJCourant, TypeEvalJoueur, Coup,3,1,0,0,0).
+obtenirCoup(CouleurJCourant,4,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,3,1,0,0,0).
+obtenirCoup(CouleurJCourant,5,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,4,1,0,0,0).
+obtenirCoup(CouleurJCourant,6,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,4,1,1,0,0).
+obtenirCoup(CouleurJCourant,7,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,5,1,1,0,0).
+obtenirCoup(CouleurJCourant,8,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,5,1,1,0,0).

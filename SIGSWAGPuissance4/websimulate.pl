@@ -32,8 +32,8 @@
 % Répond une liste des joueurs disponibles ainsi que leur code correspondant
 initAction :-
     initJeu,
-    retractall(joueurCourant(_,_)),
-    retractall(autreJoueur(_,_)),
+    retractall(joueurCourant(_,_,_)),
+    retractall(autreJoueur(_,_,_)),
 	selectionnerJoueurAction.
 
 % selectionnerJoueurAction/1(+Request)
@@ -41,15 +41,35 @@ initAction :-
 % Le joueur rouge étant le joueurCourant, c'est lui qui commencera à jouer.
 % Répond les couleurs et le code de chaqun des joueurs
 selectionnerJoueurAction :-
-	demandeTypeDeJeu(TypeJoueurR),
-	demandeTypeDeJeu(TypeJoueurJ),
+	demandeTypeDeJeu(TypeJoueurR, TypeEvalJoueurR),
+	demandeTypeDeJeu(TypeJoueurJ, TypeEvalJoueurJ),
     % random_select(TypeJoueurR,[TypeJoueur1,TypeJoueur2],[TypeJoueurJ|_]),
-    assert(joueurCourant(rouge,TypeJoueurR)),
-    assert(autreJoueur(jaune,TypeJoueurJ)),
-	tourAction.
+    assert(joueurCourant(rouge,TypeJoueurR, TypeEvalJoueurR)),
+    assert(autreJoueur(jaune,TypeJoueurJ, TypeEvalJoueurJ)),
+
+    memberRetInt(1,TypeEvalJoueur, EvalConf); memberRetInt(2,TypeEvalJoueur, EvalPosition); memberRetInt(3,TypeEvalJoueur, EvalPuissances3); memberRetInt(4,TypeEvalJoueur, EvalDensite); memberRetInt(5,TypeEvalJoueur, EvalAdjacence); memberRetInt(6,TypeEvalJoueur, EvalTest); memberRetInt(7,TypeEvalJoueur, EvalAlea);
+
+    assert(evalConf(EvalConf)),
+    assert(evalPosition(EvalPosition)),
+    assert(evalPuissances3(EvalPuissances3)),
+    assert(evalDensite(EvalDensite)),
+    assert(evalAdjacence(EvalAdjacence)),
+    assert(evalTest(EvalTest)),
+    assert(evalAlea(EvalAlea)),
+
+	tourAction,
+
+    retract(evalConf(EvalConf)),
+    retract(evalPosition(EvalPosition)),
+    retract(evalPuissances3(EvalPuissances3)),
+    retract(evalDensite(EvalDensite)),
+    retract(evalAdjacence(EvalAdjacence)),
+    retract(evalTest(EvalTest)),
+    retract(evalAlea(EvalAlea)).
 
 tourAction :-
-    joueurCourant(CouleurJCourant,1),
+    joueurCourant(CouleurJCourant,TypeJoueur, TypeEvalJoueur),
+    joueurCourant(CouleurJCourant,1,TypeEvalJoueur),
 	validerTourHumain(CouleurJCourant),
 	!.
 
@@ -87,10 +107,10 @@ validerTourHumain(CouleurJCourant) :-
 %   "continue" si la partie n'est pas terminée (dans ce cas le joueur courant est changé),
 %   "win" si le coup a amené à une victoire.
 tourIAAction :-
-    joueurCourant(CouleurJCourant,TypeJoueur),
+    joueurCourant(CouleurJCourant,TypeJoueur, TypeEvalJoueur),
 	typeJoueur(TypeJoueur,Type),
 	write('C\'est au joueur '), write(CouleurJCourant), write(' ('), write(Type), write(') de jouer.'),  nl,
-    obtenirCoup(CouleurJCourant,TypeJoueur,Colonne),
+    obtenirCoup(CouleurJCourant,TypeJoueur,TypeEvalJoueur,Colonne),
     placerJeton(Colonne,Ligne,CouleurJCourant),
 	afficher,
 	write('Joueur '), write(CouleurJCourant), write(' vient de jouer dans la colonne '), write(Colonne), write('.'),  nl,
@@ -117,43 +137,55 @@ statutJeu(_,_,_) :-
 % obtenirCoup/1(+CouleurJCourant,+CodeIA,-Coup)
 % Unifie à Colonne le coup joué par l'IA dont le code est CodeIA
 % CodeIA == 2 :- IA aleatoire
-obtenirCoup(_,2,Coup) :-
+obtenirCoup(_,2,TypeEvalJoueur,Coup) :-
     iaAleatoire(Coup).
 
-obtenirCoup(CouleurJCourant,3,Coup) :-
-    % iaMinimax(JoueurCourant,Coup,Profondeur,PoidsPosition,PoidsPuissance3,PoidsDensite,PoidsAdjacence,Alea,,PoidsTest,PoidsConf,ChoixAlgo)
-    iaMinimax(CouleurJCourant,Coup,3,1,0,0,0,1,0,0,0).
-obtenirCoup(CouleurJCourant,4,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,3,1,1,0,0,1,0,0,0).
-obtenirCoup(CouleurJCourant,5,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,4,1,0,0,0,1,0,0,0).
-obtenirCoup(CouleurJCourant,6,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,4,1,1,0,0,1,0,0,0).
-obtenirCoup(CouleurJCourant,7,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,5,1,0,0,0,1,0,0,0).
-obtenirCoup(CouleurJCourant,8,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,5,1,1,0,0,1,0,0,0).
-obtenirCoup(CouleurJCourant,9,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,3,0,0,0,0,0,1,0,0).
-obtenirCoup(CouleurJCourant,10,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,4,0,0,0,0,0,1,0,0).
-obtenirCoup(CouleurJCourant,11,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,5,0,0,0,0,0,1,0,0).
-obtenirCoup(CouleurJCourant,12,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,1,0,0,0,0,0,0,1,0).
-obtenirCoup(CouleurJCourant,13,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,2,0,0,0,0,0,0,1,0).
-obtenirCoup(CouleurJCourant,14,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,3,0,0,0,0,0,0,1,0).
-obtenirCoup(CouleurJCourant,15,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,4,0,0,0,0,0,0,1,0).
-obtenirCoup(CouleurJCourant,16,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,5,0,0,0,0,0,0,1,0).
-obtenirCoup(CouleurJCourant,17,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,1,0,0,0,0,0,0,1,1).
-obtenirCoup(CouleurJCourant,18,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,2,0,0,0,0,0,0,1,1).
-obtenirCoup(CouleurJCourant,19,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,3,0,0,0,0,0,0,1,1).
+
+member(X, [X|_]).
+member(X, [_|Y]) :- member(X,Y).
+memberRetInt(X,Y,Res) :- (member(X,Y) -> Res = 1; Res = 0).
+% iaMinimax(JoueurCourant,Coup,Profondeur,PoidsPosition,PoidsPuissance3,PoidsDensite,PoidsAdjacence,Alea,PoidsTest,PoidsConf,ChoixAlgo)
+% memberRetInt(1,TypeEvalJoueur, EvalConf), % PoidsConf
+% memberRetInt(2,TypeEvalJoueur, EvalPosition), % PoidsPosition
+% memberRetInt(3,TypeEvalJoueur, EvalPuissances3), % PoidsPuissance3
+% memberRetInt(4,TypeEvalJoueur, EvalDensite), % PoidsDensite
+% memberRetInt(5,TypeEvalJoueur, EvalAdjacence), % PoidsAdjacence
+% memberRetInt(6,TypeEvalJoueur, EvalTest), % PoidsTest
+% memberRetInt(Y,TypeEvalJoueur, EvalAlea), % PoidsAlea
+
+obtenirCoup(CouleurJCourant,3,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,Coup,3,0).
+obtenirCoup(CouleurJCourant,4,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,3,0).
+obtenirCoup(CouleurJCourant,5,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,4,0).
+obtenirCoup(CouleurJCourant,6,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,4,0).
+obtenirCoup(CouleurJCourant,7,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,5,0).
+obtenirCoup(CouleurJCourant,8,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,5,0).
+obtenirCoup(CouleurJCourant,9,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,3,0).
+obtenirCoup(CouleurJCourant,10,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,4,0).
+obtenirCoup(CouleurJCourant,11,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,5,0).
+obtenirCoup(CouleurJCourant,12,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,1,0).
+obtenirCoup(CouleurJCourant,13,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,2,0).
+obtenirCoup(CouleurJCourant,14,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,3,0).
+obtenirCoup(CouleurJCourant,15,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,4,0).
+obtenirCoup(CouleurJCourant,16,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,5,0).
+obtenirCoup(CouleurJCourant,17,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,1,1).
+obtenirCoup(CouleurJCourant,18,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,2,1).
+obtenirCoup(CouleurJCourant,19,TypeEvalJoueur,Coup) :-
+    iaMinimax(CouleurJCourant,TypeEvalJoueur,Coup,3,1).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
