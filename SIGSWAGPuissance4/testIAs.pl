@@ -9,7 +9,9 @@
 :- use_module(ia).
 :- use_module(eval).
 :- use_module(miniMax).
-:- ['webserver.pl'].
+:- use_module(util).
+
+:- ['websimulate.pl'].
 
 :- dynamic joueurCourant/2.
 :- dynamic autreJoueur/2.
@@ -25,27 +27,29 @@
 % On cherche à évaluer le nbr de coups moyen qu'il a fallu pour gagner
 runTest(NbIterations,IA1,IA2) :-
 	NbIterationsParIA is NbIterations//2,
-	call_time(runTestIAXEnPremier(NbIterationsParIA,IA1,IA2,0,NbFoisIA1GagneEnCommencant,0,NbFoisIA1PerdEnCommencant), Dict1),
-	call_time(runTestIAXEnPremier(NbIterationsParIA,IA2,IA1,0,NbFoisIA2GagneEnCommencant,0,NbFoisIA2PerdEnCommencant), Dict2),
+	runTestIAXEnPremier(NbIterationsParIA,IA1,IA2,0,NbFoisIA1GagneEnCommencant,0,NbFoisIA1PerdEnCommencant,NCoupIA1P1,NCoupIA2P1),
+	afficheKmoy(NCoupIA1P1,NCoupIA2P1, NbIterationsParIA),
+	runTestIAXEnPremier(NbIterationsParIA,IA2,IA1,0,NbFoisIA2GagneEnCommencant,0,NbFoisIA2PerdEnCommencant,NCoupIA1P2,NCoupIA2P2),
+	afficheKmoy(NCoupIA1P2,NCoupIA2P2, NbIterationsParIA),
 	typeJoueur(IA1,TypeIA1),
 	typeJoueur(IA2,TypeIA2),
-	assert(STATS_IA1(Dict1.get(wall), Dict1.get(inferences), Dict2.get(wall), Dict2.get(inferences))),
+	%assert(statsIA1(Dict1.get(wall), Dict1.get(inferences), Dict2.get(wall), Dict2.get(inferences))),
 	% STATS_IA1 = {TEMPS_SI_IA1_COMMENCE, NB_ITERATIONS_SI_IA1_COMMENCE, TEMPS_SI_IA1_NE_COMMENCE_PAS, NB_ITERATIONS_SI_IA1_NE_COMMENCE_PAS}
 
-	assert(STATS_IA2(Dict2.get(wall), Dict2.get(inferences), STATS_IA1(Dict2.get(wall), Dict1.get(inferences)))),
+	%assert(statsIA2(Dict2.get(wall), Dict2.get(inferences), STATS_IA1(Dict2.get(wall), Dict1.get(inferences)))),
 	% STATS_IA2 = {TEMPS_SI_IA2_COMMENCE, NB_ITERATIONS_SI_IA2_COMMENCE, TEMPS_SI_IA2_NE_COMMENCE_PAS, NB_ITERATIONS_SI_IA2_NE_COMMENCE_PAS}
-	write(TypeIA2), write(' en commençant : a gagné '), write(NbFoisIA2GagneEnCommencant),write(' fois et a perdu '),write(NbFoisIA2PerdEnCommencant),write(' fois.'),
+	write(TypeIA2), write(' (jaune) en commençant : a gagné '), write(NbFoisIA2GagneEnCommencant),write(' fois et a perdu '),write(NbFoisIA2PerdEnCommencant),write(' fois.'),
 	nl,
-	write(TypeIA1), write(' en commençant : a gagné '), write(NbFoisIA1GagneEnCommencant),write(' fois et a perdu '),write(NbFoisIA1PerdEnCommencant),write(' fois.'),
+	write(TypeIA1), write(' (rouge) en commençant : a gagné '), write(NbFoisIA1GagneEnCommencant),write(' fois et a perdu '),write(NbFoisIA1PerdEnCommencant),write(' fois.'),
 	statistics,
 	!.
 
 benchmark(NbIterations, IA1, IA2) :-
 	call_time(runTest(NbIterations, IA1, IA2),Dict),
-	Tmoy is Dict.get(wall) / NbIterations
-	write('Temps moyen : '), write(Tmoy),
+	tmoy is Dict.get(wall) / NbIterations,
+	write('Temps moyen : '), write(tmoy),
 	nl,
-	write('Temps total : '), write(Tmoy * NbIterations),
+	write('Temps total : '), write(tmoy * NbIterations),
 	nl,
 	statistics, %for printing threads' information like allocated memory for instance, number of inferences, etc...
 	!.
@@ -58,71 +62,66 @@ benchmark(NbIterations, IA1, IA2) :-
 %% Gestion Data Benchmark %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-saveNbRuns(X) :- assert(testRuns(X)).
-
-resetCoupsIAs :- retract(ia1Coups(X)), retract(ia2Coups(Y)), assert(ia1Coups(0)), assert(ia2Coups(0)).
 
 %resetTimerIAs :- retract(ia1Timer(X)), retract(ia2Timer(Y)), assert()
 
-incrementCoupsIA(IA) :-
- joueurCourant(X, IA),
- X = rouge,
- 	ia1Coups(S), E is S+1, retract(ia1Coups(S)), assert(ia1Coups(E));
- X = jaune,
- 	ia2Coups(S), E is S+1, retract(ia2Coups(S)), assert(ia2Coups(E)).
 
 % temps moyen avant de gagner
 %calculTmpMoy(IA, NbIterations) :-
 
 
-calculKMoy(IA, NbIterations) :- 
- joueurCourant(X, IA),
- X = rouge, ia1Coups(S), write('KMoy pour '), write(IA), M is S / NbIterations, write(M);
- X = jaune, ia2Coups(S), write('KMoy pour '), write(IA), M is S / NbIterations, write(M).
+%calculKMoy(IA, NbIterations) :- 
+% joueurCourant(rouge, IA),
+% ia1Coups(S), NbParties is NbIterations,  write('S : '), write(S), write('NBParties : '), write(NbParties), M is (S / NbParties), write('||'),  write('KMoy pour '), write(IA), write(' : '), write(M), write('\n').
+afficheKmoy(NCoupIA1,NCoupIA2, NbIterations) :- 
+ write('S : '), write(NCoupIA1), write('NBParties : '), write(NbIterations), M1 is (NCoupIA1 / NbIterations), write('||'),  write('KMoy pour IA1 '), write(' : '), write(M1), nl,
+ write('S : '), write(NCoupIA2), write('NBParties : '), write(NbIterations), M2 is (NCoupIA2 / NbIterations), write('||'),  write('KMoy pour IA2 '), write(' : '), write(M2), nl.
 
 % test de sortie de runTestIAXEnPremier
-runTestIAXEnPremier(0,_,_,NbIA1GagneIni,NbIA1GagneIni,NBNbIA2GagneIni,NbIA2GagneIni) :-
-    calculKMoy(IA1, testRuns(X)),
-	calculKMoy(IA2, testRuns(X)),
-	!.
+runTestIAXEnPremier(0,_,_,NbIA1GagneIni,NbIA1GagneIni,NbIA2GagneIni,NbIA2GagneIni,0,0) :- !.
 
-runTestIAXEnPremier(NbIterations,IA1,IA2,NbIA1GagneIni,NbIA1GagneFin,NbIA2GagneIni,NbIA2GagneFin) :-
-	saveNbRuns(NbIterations), % va être lancé à chaque fois mais ne sera assert que la première fois
+runTestIAXEnPremier(NbIterations,IA1,IA2,NbIA1GagneIni,NbIA1GagneFin,NbIA2GagneIni,NbIA2GagneFin,NCoupIA1,NCoupIA2) :-
 	init,
-	resetCoupsIAs,
 	assert(joueurCourant(rouge,IA1)), % rouge = IA1
 	assert(autreJoueur(jaune,IA2)),
-	jeu(PartieNulle),
+	jeu(PartieNulle,NCoupIA1Partie,NCoupIA2Partie),
 	joueurCourant(CouleurIAGagnante,_),
 	incrementerGagnant(PartieNulle,CouleurIAGagnante,NbIA1GagneIni,NbIA1GagneFin1,NbIA2GagneIni,NbIA2GagneFin1),
 	NbIterations2 is NbIterations-1,
-	runTestIAXEnPremier(NbIterations2,IA1,IA2,NbIA1GagneFin1,NbIA1GagneFin,NbCoupsIA1,NbIA2GagneFin1,NbIA2GagneFin,NbCoupsIA2).
+	runTestIAXEnPremier(NbIterations2,IA1,IA2,NbIA1GagneFin1,NbIA1GagneFin,NbIA2GagneFin1,NbIA2GagneFin,NCoupIA1PartiesSuivantes,NCoupIA2PartiesSuivantes),
+	NCoupIA1 is NCoupIA1PartiesSuivantes + NCoupIA1Partie,
+	NCoupIA2 is NCoupIA2PartiesSuivantes + NCoupIA2Partie.
 
 incrementerGagnant(true,_,NbIA1GagneIni,NbIA1GagneIni,NbIA2GagneIni,NbIA2GagneIni).
+%+,+,+,-,+,-
 incrementerGagnant(false,rouge,NbIA1GagneIni,NbIA1GagneFin,NbIA2GagneIni,NbIA2GagneIni) :-
 	NbIA1GagneFin is NbIA1GagneIni+1.
+%+,+,+,-,+,-
 incrementerGagnant(false,jaune,NbIA1GagneIni,NbIA1GagneIni,NbIA2GagneIni,NbIA2GagneFin) :-
 	NbIA2GagneFin is NbIA2GagneIni+1.
 
-jeu(PartieNulle) :-
-	tour(PartieNulle).
+jeu(PartieNulle,NCoupIA1,NCoupIA2) :-
+	tour(PartieNulle,NCoupIA1,NCoupIA2).
 
-tour(PartieNulle) :-
+tour(PartieNulle,NCoupIA1,NCoupIA2) :-
 	joueurCourant(CouleurJCourant,TypeJoueur),
 	obtenirCoup(CouleurJCourant,TypeJoueur,Coup),
 	placerJeton(Coup,Y,CouleurJCourant),
-	incrementCoupsIA(TypeJoueur),
-	testFin(Coup,Y,CouleurJCourant, PartieNulle).
+	testFin(Coup,Y,CouleurJCourant, PartieNulle,NCoupIA1Fin,NCoupIA2Fin),
+	incrJoueurCoup(CouleurJCourant,NCoupIA1Fin,NCoupIA2Fin,NCoupIA1,NCoupIA2).
 
-testFin(Coup,Y,CouleurJCourant,PartieNulle) :-
-	gagne(Coup,Y,CouleurJCourant),
-	PartieNulle=false.
-testFin(_,_,_,PartieNulle) :-
-	not(coupPossible),
-	PartieNulle=true.
-testFin(_,_,_,PartieNulle) :-
+testFin(Coup,Y,CouleurJCourant,false,0,0) :-
+	gagne(Coup,Y,CouleurJCourant).
+testFin(_,_,_,true,0,0) :-
+	not(coupPossible).
+testFin(_,_,_,PartieNulle,NCoupIA1,NCoupIA2) :-
 	changerJoueur,
-	tour(PartieNulle).
+	tour(PartieNulle,NCoupIA1,NCoupIA2).
+
+incrJoueurCoup(rouge,NCoupIA1Fin,NCoupIA2Fin,NCoupIA1,NCoupIA2Fin) :-
+	NCoupIA1 is NCoupIA1Fin+1.
+incrJoueurCoup(jaune,NCoupIA1Fin,NCoupIA2Fin,NCoupIA1Fin,NCoupIA2) :-
+	NCoupIA2 is NCoupIA2Fin+1.
 
 init :-
 	initJeu,
