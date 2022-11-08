@@ -77,8 +77,8 @@ evalCase(X,Y,Courant,ScoreCase) :-
 	Dx is X - CentreX,
 	Dy is Y - CentreY,
 	abs(Dx,AbsX),
-	abs(Dy,AbsY),
-	ScoreCase is ( 200/(AbsX+1) + 200/(AbsY+1) )*PonderationJoueur.
+	abs(Dy,OrdY),
+	ScoreCase is ( 200/(AbsX+1) + 200/(OrdY+1) )*PonderationJoueur.
 
 ponderationJ(X,Y, Courant,1) :-
 	caseTest(X,Y,Courant), !.
