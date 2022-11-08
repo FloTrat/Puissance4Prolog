@@ -22,3 +22,6 @@ Les fichiers sources sont séparés en deux parties : les prédicats "publics" (
 
 ## Modification du code de l'ancien projet
 Les modifications que nous avons apportées au code de l'ancien projet sont marquées par l'annotation commentée `"Modification du code source"` au début et par une ligne de `"%"` en fin de code ajouté. Les modifications sont présentes un peu partout dans le code d'origine.
+
+Certains fichiers ont été depréciés ( DEPRECATED ), cela signifie qu'il ne sont plus utilisés dans le projet final.
+Ils restent tout de même disponible pour montrer l'évolution du projet.
