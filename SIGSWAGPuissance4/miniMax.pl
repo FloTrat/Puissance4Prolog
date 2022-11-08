@@ -38,7 +38,7 @@ parcoursArbre(J,Pmax,1,BestX,BestScore) :-
 	initCaseTest,assert(maximizer(J)), assert(joueurCourant(J)),
 	nbColonnes(NBCOLONNES),
 	bestScoreCol(NBCOLONNES,Pmax,BestScore,BestX,1),
-	write("BestX: "), write(BestX), write(" Score: "), write(BestScore), nl,
+	%write("BestX: "), write(BestX), write(" Score: "), write(BestScore), nl,
 	clearTest,!. % the second call and the next ones are called with the result of the preceding (we take the max of all of them) on reset le joueur entre chaque call
 
 bestScoreCol(0,_,BestScore,0,_) :- infiniteNeg(BestScore).
@@ -61,7 +61,9 @@ compScore(_,_,X1,ScoreX1,X1,ScoreX1).
 
 parcoursNew(X,_,ScoreX) :- nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,ScoreX).
 parcoursNew(X,_,ScoreX) :- nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), not(maximizer(Joue)), infinitePos(2,ScoreX).
-parcoursNew(X,0,ScoreX) :- joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, ScoreX), retract(caseTest(X,Y,Joue)).
+parcoursNew(X, P, ScoreX):-
+	joueurCourant(Joue), calculPositionJeton(X, 1, Y), gagneTest(X,Y,Joue,Direct), victoireDirecteNew(X,Y,Joue,P,Direct,ScoreX).
+parcoursNew(X,1,ScoreX) :- joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, ScoreX), retract(caseTest(X,Y,Joue)).
 parcoursNew(X,P,BestScore) :-
 	%write("X: "),write(X),write(" P: "),write(P),nl,
 	joueurCourant(J),
@@ -72,6 +74,31 @@ parcoursNew(X,P,BestScore) :-
 	bestScoreCol(NBCOLONNES,NewP,BestScore,_,0),
 	changerJoueur,
 	retract(caseTest(X,Y,J)).
+
+victoireDirecteNew(_,_,J,P,1,Value):- maximizer(J), Pp is 1-P, infinitePos(Pp,Value). %Victoire du max
+victoireDirecteNew(_,_,J,P,1,Value):- not(maximizer(J)), Pp is 1-P, infiniteNeg(Pp,Value). %Victoire du min
+
+victoireDirecteNew(X,Y,J,_,0,_):- assert(caseTest(X,Y,J)), false.
+
+victoireDirecteNew(X,Y,J,P,0,Value):- maximizer(J), Pp is -P, infinitePos(Pp,Value),
+	autreJoueur(J2), testDefaiteProchaine(J2),
+	retract(caseTest(X,Y,J)). %Victoire anticipée du max
+victoireDirecteNew(X,Y,J,P,0,Value):- not(maximizer(J)), Pp is -P, infiniteNeg(Pp,Value),
+	autreJoueur(J2), testDefaiteProchaine(J2),
+	retract(caseTest(X,Y,J)). %Victoire anticipée du min
+
+victoireDirecteNew(X,Y,J,_,0,_):- retract(caseTest(X,Y,J)), false. %ménage si on perde derrière
+
+victoireDirecteNew(X,Y,J,_,-5,_):- assert(caseTest(X,Y,J)), false.
+
+victoireDirecteNew(X,Y,J,P,-5,Value):- maximizer(J), Pp is -5-P, infinitePos(Pp,Value),
+	autreJoueur(J2), testDefaiteAnticipeeProchaine(J2),
+	retract(caseTest(X,Y,J)). %Victoire anticipée du max
+victoireDirecteNew(X,Y,J,P,-5,Value):- not(maximizer(J)), Pp is -5-P, infiniteNeg(Pp,Value),
+	autreJoueur(J2), testDefaiteAnticipeeProchaine(J2),
+	retract(caseTest(X,Y,J)). %Victoire anticipée du min
+
+victoireDirecteNew(X,Y,J,_,-5,_):- retract(caseTest(X,Y,J)), false. %ménage si on perde derrière
 
 
 %%%%%%%%%%%%%%%%%%%%%%
