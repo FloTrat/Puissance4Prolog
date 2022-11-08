@@ -9,7 +9,8 @@
 	coupValide/1,
 	typeJoueur/2,
 	changerJoueur/0,
-	insererJeton/3
+	insererJeton/3,
+	typeHeuristique/2
 ]).
 
 %%%%%%%%%%%%%%%%
@@ -28,43 +29,46 @@
 %% Prédicats publics %%
 %%%%%%%%%%%%%%%%%%%%%%%
 
+%%% Gestion des heuristiques %%%
+% Définitiion des heuristiques.
+typeHeuristique(1, 'evalConf').
+typeHeuristique(2, 'evalPosition').
+typeHeuristique(3, 'evalPuissances3').
+typeHeuristique(4, 'densite').
+typeHeuristique(5, 'evalAdjacence').
+typeHeuristique(6, 'evalTest').
+typeHeuristique(7, 'poidsAlea').
+
 %%% Gestion des joueurs %%%
 
 % Définition des différentes IA.
 typeJoueur(1,'Humain').
 typeJoueur(2,'IA Aléatoire').
-typeJoueur(3,'IA Minimax 3 - eval Position').
-typeJoueur(4,'IA Minimax 3 - eval Position+Puissance3').
-typeJoueur(5,'IA Minimax 4 - eval Position').
-typeJoueur(6,'IA Minimax 4 - eval Position+Puissance3').
-typeJoueur(7,'IA Minimax 5 - eval Position').
-typeJoueur(8,'IA Minimax 5 - eval Position+Puissance3').
-typeJoueur(9,'IA Minimax 3 - eval tests').
-typeJoueur(10,'IA Minimax 4 - eval tests').
-typeJoueur(11,'IA Minimax 5 - eval tests').
-typeJoueur(12,'IA Minimax 1 - eval Configuration').
-typeJoueur(13,'IA Minimax 2 - eval Configuration').
-typeJoueur(14,'IA Minimax 3 - eval Configuration').
-typeJoueur(15,'IA Minimax 4 - eval Configuration').
-typeJoueur(16,'IA Minimax 5 - eval Configuration').
-typeJoueur(17,'IA Minimax 1 - eval Configuration - new Algo').
-typeJoueur(18,'IA Minimax 2 - eval Configuration - new Algo').
-typeJoueur(19,'IA Minimax 3 - eval Configuration - new Algo').
+typeJoueur(3,'IA Minimax 1').
+typeJoueur(4,'IA Minimax 2').
+typeJoueur(5,'IA Minimax 3').
+typeJoueur(6,'IA Minimax 4').
+typeJoueur(7,'IA Minimax 5').
+typeJoueur(8,'IA Minimax 1 - Algo HeptarchieCorp').
+typeJoueur(9,'IA Minimax 2 - Algo HeptarchieCorp').
+typeJoueur(10,'IA Minimax 3 - Algo HeptarchieCorp').
+typeJoueur(11,'IA Minimax 4 - Algo HeptarchieCorp').
+typeJoueur(12,'IA Minimax 5 - Algo HeptarchieCorp').
 
 changerJoueur :-
-	joueurCourant(rouge,TypeJoueurR),
-	autreJoueur(jaune,TypeJoueurJ),
-	retractall(joueurCourant(_,_)),
-	retractall(autreJoueur(_,_)),
-	assert(joueurCourant(jaune,TypeJoueurJ)),
-	assert(autreJoueur(rouge,TypeJoueurR)),!.
+	joueurCourant(rouge,TypeJoueurR, TypeEvalJoueurR),
+	autreJoueur(jaune,TypeJoueurJ, TypeEvalJoueurJ),
+	retractall(joueurCourant(_,_,_)),
+	retractall(autreJoueur(_,_,_)),
+	assert(joueurCourant(jaune,TypeJoueurJ, TypeEvalJoueurJ)),
+	assert(autreJoueur(rouge,TypeJoueurR, TypeEvalJoueurR)),!.
 changerJoueur :-
-	joueurCourant(jaune,TypeJoueurJ),
-	autreJoueur(rouge,TypeJoueurR),
-	retractall(joueurCourant(_,_)),
-	retractall(autreJoueur(_,_)),
-	assert(joueurCourant(rouge,TypeJoueurR)),
-	assert(autreJoueur(jaune,TypeJoueurJ)),!.
+	joueurCourant(jaune,TypeJoueurJ, TypeEvalJoueurJ),
+	autreJoueur(rouge,TypeJoueurR, TypeEvalJoueurR),
+	retractall(joueurCourant(_,_,_)),
+	retractall(autreJoueur(_,_,_)),
+	assert(joueurCourant(rouge,TypeJoueurR, TypeEvalJoueurR)),
+	assert(autreJoueur(jaune,TypeJoueurJ, TypeEvalJoueurJ)),!.
 
 
 %%% Prédicats utiles

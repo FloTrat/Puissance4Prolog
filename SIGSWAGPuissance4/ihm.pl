@@ -4,7 +4,7 @@
 
 %%%%%%%%%%%% ihm.pl %%%%%%%%%%%%
 
-:- module(ihm, [afficher/0, demandeCoup/3, afficherGagnant/4, afficherPartieNulle/0, demandeTypeDeJeu/1]).
+:- module(ihm, [afficher/0, demandeCoup/3, afficherGagnant/4, afficherPartieNulle/0, demandeTypeDeJeu/2]).
 
 :- use_module(util).
 
@@ -47,17 +47,32 @@ afficherPartieNulle :-
 	nl,
 	write('Il y a egalite entre les 2 joueurs').
 
+p(X) :- read(A), q(A,X-[]).
+q(end,X-X) :- !.
+q(A,[A|X]-Y) :- read(B), q(B,X-Y).
+
 % demandeTypeDeJeu/1(-TypeDeJeu)
 % Demande à l'utilisateur de saisir un type de jeu. N'échoue pas en cas d'entrée invalide (en dehors des valeurs possibles).
 % TypeDeJeu s'unifie au type saisi par l'utilisateur.
-demandeTypeDeJeu(TypeDeJeu) :-
-    write('   --- Puissance 4 ---'), nl,
-	findall(_, afficherTypeJoueur(_,_), _),
-    nl, nl,
+demandeTypeDeJeu(TypeIA, TypeEval) :-
+	write('   --- Puissance 4 ---'), nl,
+	write('   --- Veuillez choisir une IA ---'), nl,
+		findall(_, afficherTypeJoueur(_,_), _),
+	nl, nl,
 	write(' ----------------------- '), nl,
     write('Saisissez votre choix :'), nl,
-    read(TypeDeJeu), integer(TypeDeJeu).
+    read(TypeIA), integer(TypeIA),
 
+	((TypeIA =\= 1, TypeIA =\= 2) ->
+		nl,
+		write(' ----------------------- '), nl,
+		write('   --- Veuillez choisir une ou plusieurs heuristiques ---'), nl,
+		write('   --- ex: Pour choisir l''heuristique 1, entrer ''1.'' puis ''end.'' ---'), nl,
+		findall(_, afficherTypeHeuristique(_,_), _),
+		write(' ----------------------- '), nl,
+		p(TypeEval)
+	;write('')).
+	
 
 %%%%%%%%%%%%%%%%%%%%%%
 %% Prédicats privés %%
@@ -96,4 +111,8 @@ saisirCoup(Coup) :-
 
 afficherTypeJoueur(I,J) :-
 	typeJoueur(I,J),
+	write('\t'), write(I), write('. '), write(J), nl.
+
+afficherTypeHeuristique(I,J) :-
+	typeHeuristique(I,J),
 	write('\t'), write(I), write('. '), write(J), nl.
