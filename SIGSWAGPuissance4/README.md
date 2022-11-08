@@ -1,8 +1,9 @@
 # PrologPuissance4
-Projet Prolog - Jeu du puissance 4   
+Projet Prolog - Jeu du puissance 4
+Le socle du projet est nommé SIGSWAGPuissance4 et réalisé par un groupe d'INSAliens en 2015 : https://github.com/SIGSWAG/PrologPuissance4 à savoir Marc JAVIN et Loïc TOUZARD.
 
 
-## Service web  
+## IHM 
 Pour lancer une partie, il faut exécuter le fichier `websimulate.pl`, puis écrire le prédicat `"initAction."`.
 Pour exécuter le fichier `websimulate.pl`:
 ```
@@ -16,9 +17,6 @@ Il faudra penser à écrire un `"."` à chaque fin de prédicat/commande entré 
 ## Les sources
 ## Service web DÉPRÉCIÉ
 Pour lancer le serveur prolog, exécutez le fichier `webserver.pl` et écrivez le prédicat `server(8000).` (ou `start.`). Puis accédez à `http://localhost:8000/game` pour jouer !
-
-## IHM 
-Pour pouvoir jouer au puissance 4, il faut compiler le fichier ./SIGSWAGPuissance4/websimulate.pl puis lancer le prédicat initAction.
 
 ## Tests et benchmarking 
 Pour pouvoir lancer les tests entre IAs ou le benchmarking, il faut compiler le fichier ./SIGSWAGPuissance4/testIAs.pl puis lancer le prédicat runTest(nbItérations, IA1, IA2). ou le prédicat benchmark(NbItérations, IA1, IA2).
