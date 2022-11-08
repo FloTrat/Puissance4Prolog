@@ -26,8 +26,8 @@
 % On cherche à évaluer le nbr de coups moyen qu'il a fallu pour gagner
 runTest(NbIterations,IA1,IA2) :-
 	NbIterationsParIA is NbIterations//2,
-	typeJoueur(IA1,TypeIA1),
-	typeJoueur(IA2,TypeIA2),
+	typeJoueurPreconf(IA1,TypeIA1,_,_,_),
+	typeJoueurPreconf(IA2,TypeIA2,_,_,_),
 	runTestIAXEnPremier(NbIterationsParIA,IA1,IA2,0,NbFoisIA1GagneEnCommencant,0,NbFoisIA1PerdEnCommencant,NCoupIA1P1,NCoupIA2P1),
 	write("Stats sur "),write(NbIterationsParIA),write(" parties où IA1 ("),write(TypeIA1),write(") commence: "),nl,
 	IA1MoyP1 is NCoupIA1P1/NbIterationsParIA,
@@ -104,7 +104,7 @@ jeu(PartieNulle,NCoupIA1,NCoupIA2) :-
 
 tour(PartieNulle,NCoupIA1,NCoupIA2) :-
 	joueurCourant(CouleurJCourant,TypeJoueur),
-	obtenirCoup(CouleurJCourant,TypeJoueur,Coup),
+	obtenirCoupPreconf(CouleurJCourant,TypeJoueur,Coup),
 	placerJeton(Coup,Y,CouleurJCourant),
 	testFin(Coup,Y,CouleurJCourant, PartieNulle,NCoupIA1Fin,NCoupIA2Fin),
 	incrJoueurCoup(CouleurJCourant,NCoupIA1Fin,NCoupIA2Fin,NCoupIA1,NCoupIA2).
@@ -114,13 +114,35 @@ testFin(Coup,Y,CouleurJCourant,false,0,0) :-
 testFin(_,_,_,true,0,0) :-
 	not(coupPossible).
 testFin(_,_,_,PartieNulle,NCoupIA1,NCoupIA2) :-
-	changerJoueur,
+	changerJoueurPreconf,
 	tour(PartieNulle,NCoupIA1,NCoupIA2).
 
 incrJoueurCoup(rouge,NCoupIA1Fin,NCoupIA2Fin,NCoupIA1,NCoupIA2Fin) :-
 	NCoupIA1 is NCoupIA1Fin+1.
 incrJoueurCoup(jaune,NCoupIA1Fin,NCoupIA2Fin,NCoupIA1Fin,NCoupIA2) :-
 	NCoupIA2 is NCoupIA2Fin+1.
+
+obtenirCoupPreconf(_,2,Colonne) :-
+	iaAleatoire(Colonne), !.
+obtenirCoupPreconf(CouleurJCourant,JoueurPreconf,Colonne) :-
+	typeJoueurPreconf(JoueurPreconf,_,ChoixAlgo,ListEval,Profondeur),
+	iaMinimax(CouleurJCourant,Colonne,Profondeur,ChoixAlgo,ListEval).
+
+
+changerJoueurPreconf :-
+	joueurCourant(rouge,TypeJoueurR),
+	autreJoueur(jaune,TypeJoueurJ),
+	retractall(joueurCourant(_,_)),
+	retractall(autreJoueur(_,_)),
+	assert(joueurCourant(jaune,TypeJoueurJ)),
+	assert(autreJoueur(rouge,TypeJoueurR)),!.
+changerJoueurPreconf :-
+	joueurCourant(jaune,TypeJoueurJ),
+	autreJoueur(rouge,TypeJoueurR),
+	retractall(joueurCourant(_,_)),
+	retractall(autreJoueur(_,_)),
+	assert(joueurCourant(rouge,TypeJoueurR)),
+	assert(autreJoueur(jaune,TypeJoueurJ)),!.
 
 init :-
 	initJeu,

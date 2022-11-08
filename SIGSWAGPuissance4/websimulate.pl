@@ -63,41 +63,41 @@ tourAction :-
     joueurCourant(CouleurJCourant,TypeJoueur,ListEval),
 	typeJoueur(TypeJoueur,Type),
 	write('C\'est au joueur '), write(CouleurJCourant), write(' ('), write(Type), write(') de jouer.'),  nl,
-	jouer(CouleurJCourant,TypeJoueur,ListEval,Colonne),
+	obtenirCoup(CouleurJCourant,TypeJoueur,ListEval,Colonne),
     placerJeton(Colonne,Ligne,CouleurJCourant),
 	afficher,
 	write('Joueur '), write(CouleurJCourant), write(' vient de jouer dans la colonne '), write(Colonne), write('.'),  nl,
     statutJeu(Colonne,Ligne,CouleurJCourant).
 
-jouer(_,1,_,Colonne) :-
+obtenirCoup(_,1,_,Colonne) :-
 	write('Saisissez votre colonne :'), nl,
     read(Colonne), integer(Colonne).
 
-jouer(_,2,_,Colonne) :-
+obtenirCoup(_,2,_,Colonne) :-
 	iaAleatoire(Colonne).
 
-% obtenirCoup/1(+CouleurJCourant,+CodeIA,-Coup)
+% obtenirCoup/1(+CouleurJCourant,+CodeIA,+ListEval,-Colonne)
 % Unifie à Colonne le coup joué par l'IA dont le code est CodeIA
 % CodeIA == 2 :- IA aleatoire
-jouer(CouleurJCourant,3,ListEval,Colonne) :-
+obtenirCoup(CouleurJCourant,3,ListEval,Colonne) :-
 	iaMinimax(CouleurJCourant,Colonne,1,0,ListEval).
-jouer(CouleurJCourant,4,ListEval,Colonne) :-
+obtenirCoup(CouleurJCourant,4,ListEval,Colonne) :-
 	iaMinimax(CouleurJCourant,Colonne,2,0,ListEval).
-jouer(CouleurJCourant,5,ListEval,Colonne) :-
+obtenirCoup(CouleurJCourant,5,ListEval,Colonne) :-
 	iaMinimax(CouleurJCourant,Colonne,3,0,ListEval).
-jouer(CouleurJCourant,6,ListEval,Colonne) :-
+obtenirCoup(CouleurJCourant,6,ListEval,Colonne) :-
 	iaMinimax(CouleurJCourant,Colonne,4,0,ListEval).
-jouer(CouleurJCourant,7,ListEval,Colonne) :-
+obtenirCoup(CouleurJCourant,7,ListEval,Colonne) :-
 	iaMinimax(CouleurJCourant,Colonne,5,0,ListEval).
-jouer(CouleurJCourant,8,ListEval,Colonne) :-
+obtenirCoup(CouleurJCourant,8,ListEval,Colonne) :-
 	iaMinimax(CouleurJCourant,Colonne,1,1,ListEval).
-jouer(CouleurJCourant,9,ListEval,Colonne) :-
+obtenirCoup(CouleurJCourant,9,ListEval,Colonne) :-
 	iaMinimax(CouleurJCourant,Colonne,2,1,ListEval).
-jouer(CouleurJCourant,10,ListEval,Colonne) :-
+obtenirCoup(CouleurJCourant,10,ListEval,Colonne) :-
 	iaMinimax(CouleurJCourant,Colonne,3,1,ListEval).
-jouer(CouleurJCourant,11,ListEval,Colonne) :-
+obtenirCoup(CouleurJCourant,11,ListEval,Colonne) :-
 	iaMinimax(CouleurJCourant,Colonne,4,1,ListEval).
-jouer(CouleurJCourant,12,ListEval,Colonne) :-
+obtenirCoup(CouleurJCourant,12,ListEval,Colonne) :-
 	iaMinimax(CouleurJCourant,Colonne,5,1,ListEval).
 
 %%%%%%%%%%%%%%%
@@ -116,6 +116,5 @@ statutJeu(_,_,_) :-
 statutJeu(_,_,_) :-
     changerJoueur,
 	tourAction.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

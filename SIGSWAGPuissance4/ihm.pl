@@ -51,7 +51,7 @@ readEval(ListEval) :- read(X), evals(X,ListEval).
 evals(end,[]) :- !.
 evals(X,[X|ListEval]) :- read(Y), evals(Y,ListEval).
 
-empty([]).
+emptyList([]).
 
 % demandeTypeDeJeu/1(-TypeDeJeu)
 % Demande à l'utilisateur de saisir un type de jeu. N'échoue pas en cas d'entrée invalide (en dehors des valeurs possibles).
@@ -73,7 +73,7 @@ demandeTypeDeJeu(TypeIA, TypeEval) :-
 		findall(_, afficherTypeHeuristique(_,_), _),
 		write(' ----------------------- '), nl,
 		readEval(TypeEval)
-	;empty(TypeEval)).
+	;emptyList(TypeEval)).
 	
 
 %%%%%%%%%%%%%%%%%%%%%%
