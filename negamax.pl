@@ -50,20 +50,20 @@ betterof( Pos0, Val0, Pos1, Val1, Pos1, Val1).           % Otherwise Pos1 better
 % idastar( Start, Solution):
 %     Perform IDA* search; Start is the start node, Solution is the solution path
 idastar( Start, Solution) :-
-    retract( next_bound(_)), fail    % Clear next_bound
-    ;
-    asserta( next_bound( 0)),        % Initialize bound
-    idastar0( Start, Solution).
+  retract( next_bound(_)), fail    % Clear next_bound
+  ;
+  asserta( next_bound( 0)),        % Initialize bound
+  idastar0( Start, Solution).
 
 idastar0( Start, Sol) :-
-    retract( next_bound( Bound)),    % Current bound
-    asserta( next_bound( 99999)),    % Initialize next bound
-    f( Start, F),                    % f-value of start node
-    df( [Start], F, Bound, Sol)      % Find solution; if not, change bound
-    ;
-    next_bound( NextBound),
-    NextBound < 99999,               % Bound finite
-    idastar0( Start, Sol).           % Try with new bound
+  retract( next_bound( Bound)),    % Current bound
+  asserta( next_bound( 99999)),    % Initialize next bound
+  f( Start, F),                    % f-value of start node
+  df( [Start], F, Bound, Sol)      % Find solution; if not, change bound
+  ;
+  next_bound( NextBound),
+  NextBound < 99999,               % Bound finite
+  idastar0( Start, Sol).           % Try with new bound
 
 % df( Path, F, Bound, Sol):
 % Perform depth-first search within Bound
