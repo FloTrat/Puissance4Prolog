@@ -3,8 +3,9 @@ import re
 
 main_cmd = 'prolog -g runTest({nb_iterations},{ia1},{ia2}),halt -f ../testIAs.pl'
 
-nb_iterations = 2
+nb_iterations = 10
 
+#préparer analyse via matplotlib
 lines={}
 lines[0]=' ;'
 for i in range(2,9):
