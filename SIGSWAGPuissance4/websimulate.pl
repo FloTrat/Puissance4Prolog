@@ -1,5 +1,9 @@
-%%%%%%%%%%%% webserver.pl %%%%%%%%%%%%
-% Serveur web permettant d'interfacer Prolog avec notre IHM web.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Adaptation du code 'webserver.pl' %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%% websimulate.pl %%%%%%%%%%%%
+% Serveur web permettant d'interfacer Prolog avec notre IHM console.
 
 %%%%%%%%%%%%%%%%
 %% Inclusions %%
@@ -117,31 +121,39 @@ obtenirCoup(_,2,Coup) :-
     iaAleatoire(Coup).
 
 obtenirCoup(CouleurJCourant,3,Coup) :-
-    % iaMinimax(JoueurCourant,Coup,Profondeur,PoidsPosition,PoidsPuissance3,PoidsDensite,PoidsAdjacence,Alea,,PoidsTest,PoidsConf)
-    iaMinimax(CouleurJCourant,Coup,3,1,0,0,0,1,0,0).
+    % iaMinimax(JoueurCourant,Coup,Profondeur,PoidsPosition,PoidsPuissance3,PoidsDensite,PoidsAdjacence,Alea,,PoidsTest,PoidsConf,ChoixAlgo)
+    iaMinimax(CouleurJCourant,Coup,3,1,0,0,0,1,0,0,0).
 obtenirCoup(CouleurJCourant,4,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,3,1,1,0,0,1,0,0).
+    iaMinimax(CouleurJCourant,Coup,3,1,1,0,0,1,0,0,0).
 obtenirCoup(CouleurJCourant,5,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,4,1,0,0,0,1,0,0).
+    iaMinimax(CouleurJCourant,Coup,4,1,0,0,0,1,0,0,0).
 obtenirCoup(CouleurJCourant,6,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,4,1,1,0,0,1,0,0).
+    iaMinimax(CouleurJCourant,Coup,4,1,1,0,0,1,0,0,0).
 obtenirCoup(CouleurJCourant,7,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,5,1,0,0,0,1,0,0).
+    iaMinimax(CouleurJCourant,Coup,5,1,0,0,0,1,0,0,0).
 obtenirCoup(CouleurJCourant,8,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,5,1,1,0,0,1,0,0).
+    iaMinimax(CouleurJCourant,Coup,5,1,1,0,0,1,0,0,0).
 obtenirCoup(CouleurJCourant,9,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,3,0,0,0,0,0,1,0).
+    iaMinimax(CouleurJCourant,Coup,3,0,0,0,0,0,1,0,0).
 obtenirCoup(CouleurJCourant,10,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,4,0,0,0,0,0,1,0).
+    iaMinimax(CouleurJCourant,Coup,4,0,0,0,0,0,1,0,0).
 obtenirCoup(CouleurJCourant,11,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,5,0,0,0,0,0,1,0).
+    iaMinimax(CouleurJCourant,Coup,5,0,0,0,0,0,1,0,0).
 obtenirCoup(CouleurJCourant,12,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,1,0,0,0,0,0,0,1).
+    iaMinimax(CouleurJCourant,Coup,1,0,0,0,0,0,0,1,0).
 obtenirCoup(CouleurJCourant,13,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,2,0,0,0,0,0,0,1).
+    iaMinimax(CouleurJCourant,Coup,2,0,0,0,0,0,0,1,0).
 obtenirCoup(CouleurJCourant,14,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,3,0,0,0,0,0,0,1).
+    iaMinimax(CouleurJCourant,Coup,3,0,0,0,0,0,0,1,0).
 obtenirCoup(CouleurJCourant,15,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,4,0,0,0,0,0,0,1).
+    iaMinimax(CouleurJCourant,Coup,4,0,0,0,0,0,0,1,0).
 obtenirCoup(CouleurJCourant,16,Coup) :-
-    iaMinimax(CouleurJCourant,Coup,5,0,0,0,0,0,0,1).
+    iaMinimax(CouleurJCourant,Coup,5,0,0,0,0,0,0,1,0).
+obtenirCoup(CouleurJCourant,17,Coup) :-
+    iaMinimax(CouleurJCourant,Coup,1,0,0,0,0,0,0,1,1).
+obtenirCoup(CouleurJCourant,18,Coup) :-
+    iaMinimax(CouleurJCourant,Coup,2,0,0,0,0,0,0,1,1).
+obtenirCoup(CouleurJCourant,19,Coup) :-
+    iaMinimax(CouleurJCourant,Coup,3,0,0,0,0,0,0,1,1).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

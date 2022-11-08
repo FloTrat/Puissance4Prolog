@@ -47,6 +47,9 @@ typeJoueur(13,'IA Minimax 2 - eval Configuration').
 typeJoueur(14,'IA Minimax 3 - eval Configuration').
 typeJoueur(15,'IA Minimax 4 - eval Configuration').
 typeJoueur(16,'IA Minimax 5 - eval Configuration').
+typeJoueur(17,'IA Minimax 1 - eval Configuration - new Algo').
+typeJoueur(18,'IA Minimax 2 - eval Configuration - new Algo').
+typeJoueur(19,'IA Minimax 3 - eval Configuration - new Algo').
 
 changerJoueur :-
 	joueurCourant(rouge,TypeJoueurR),
@@ -78,8 +81,8 @@ initJeu :-
 % Vérifie si l'on peut encore joueur.
 % Vrai s'il reste des coups valides, faux sinon
 coupPossible :-
-	nbColonnes(NBCOLLONNES),
-	between(1,NBCOLLONNES,X),
+	nbColonnes(NBCOLONNES),
+	between(1,NBCOLONNES,X),
 	coupValide(X).
 
 %%% Vérification de la victoire

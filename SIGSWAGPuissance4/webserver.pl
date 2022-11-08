@@ -1,4 +1,12 @@
-﻿%%%%%%%%%%%% webserver.pl %%%%%%%%%%%%
+﻿
+
+    %%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%   DEPRECATED   %%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%% webserver.pl %%%%%%%%%%%%
 % Serveur web permettant d'interfacer Prolog avec notre IHM web.
 
 %%%%%%%%%%%%%%%%
