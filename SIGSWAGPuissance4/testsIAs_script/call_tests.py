@@ -3,7 +3,9 @@ import re
 
 main_cmd = 'prolog -g runTest({nb_iterations},{ia1},{ia2}),halt -f ../testIAs.pl'
 
+##################################################### Modification du code source #####################################################
 nb_iterations = 10
+#######################################################################################################################################
 
 #préparer analyse via matplotlib
 lines={}

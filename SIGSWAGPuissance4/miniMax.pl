@@ -1,7 +1,9 @@
 ﻿%%%%%%%%%%%% miniMax.pl %%%%%%%%%%%%
 % Implémentation de minimax avec diverses optimisations propres au Puissance 4.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- module(miniMax, [parcoursArbre/5, caseTest/3, gagneTest/4]).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%
 %% Inclusions %%
@@ -22,6 +24,8 @@
 
 % parcoursArbre/4(+J,+Pmax,+ChoixAlgo,-R,-Value)
 % Parcours l'arbre de jeu en évaluant les feuilles grâces aux différentes fonctions d'évaluation. +J : joueur devant jouer, +Pmax : profondeur maximale, -R : le coup à jouer, -Value : évaluation du noeud courant.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 parcoursArbre(J,Pmax,0,R,Value) :-
 	initCaseTest,infinitePos(InfP),infiniteNeg(InfN),assert(maximizer(J)), assert(joueurCourant(J)),
 	parcours(1,1,Pmax,[1,0],InfP,InfN), feuille([1,0],X1),
@@ -163,6 +167,8 @@ victoireDirecteNew(X,Y,J,P,-5,Value):- not(maximizer(J)), Pp is -5-P, infiniteNe
 
 victoireDirecteNew(X,Y,J,_,-5,_):- retract(caseTest(X,Y,J)), false. %ménage si on perde derrière
 */
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%%%%%%%%%%%
 %% Prédicats privés %%
@@ -176,6 +182,8 @@ clearTest :-
 	retractall(feuille(X,Y)),
 	retract(maximizer(X)), retract(joueurCourant(_)). % on eve tout ce que l'on a ajouté.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % parcours/6(+X, +Profondeur, +ProfondeurMax, +???, +Alpha, +Beta)
 parcours(X, _, _, L, _, _) :-
 	nbLignes(MaxLignes),case(X,MaxLignes,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,Value), assert(feuille(L, Value)). % on ne peut PAS jouer, on met -infini
@@ -187,6 +195,8 @@ parcours(X, P, _, L, _, _):-
 	joueurCourant(Joue), calculPositionJeton(X, 1, Y), gagneTest(X,Y,Joue,Direct), victoireDirecte(X,Y,Joue,L,P,Direct).
 
 parcours(X, P, Pmax, L, _, _):- P==Pmax,joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, Value), retract(caseTest(X,Y,Joue)), assert(feuille(L, Value)). % on est à la prof max, on evalue et on met une feuille
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 parcours(X, P, Pmax, L, Beta, Alpha) :- incr(P, P1),joueurCourant(Joue), placerJeton(X,Y,Joue), %on incremente la profondeur, puis on joue un coup(qui réussit a tous les coups)
 	setJoueur(P1), %on set le joueur
 	attribueVal(ValeurPrec), % on initialise val
@@ -304,6 +314,7 @@ attribueVal(X):- infiniteNeg(InfN), joueurCourant(Joue), maximizer(Joue), X is I
 attribueVal(X):-infinitePos(InfP), X is InfP.
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%For the Minimizer
 joueCoupSuivant(ValeurPrec,ColonneAJouer,_,_,L,Beta,Alpha,Val,Beta,Alpha):-
 	joueurCourant(Joue), not(maximizer(Joue)),
@@ -328,6 +339,7 @@ joueCoupSuivant(ValeurPrec,ColonneAJouer,P1,Pmax,L, Beta, Alpha,Val,Beta,AlphaCa
 	parcours(ColonneAJouer, P1,Pmax,[ColonneAJouer|L],Beta, AlphaCalc),
 	feuille([ColonneAJouer|L], ValeurFils),
 	Val is max(ValeurFils, ValeurPrec). %pas de coupure!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
@@ -404,9 +416,11 @@ gagneTest(X,Y,J,V) :- %V=1 si victoire direct, 0 si indirect
 	gagneLigneTest(X,Y,J,R2,P2,A2),
 	gagneDiag1Test(X,Y,J,R3,P3,A3),
 	gagneDiag2Test(X,Y,J,R4,P4,A4),
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	Pf is P2+P3+P4, % cases adjacentes vides jouables autour des lignes du joueur (de 0 à 6) - case vide au dessus (colonne) exclue
 	Af is A1+A2+A3+A4, % lorsque case vide jouable, indique si la case du dessus est aussi gagnante (de 0 à 7)
 	testFinal(R1,R2,R3,R4,Pf,Af,V), % V s'unifie à 1 si directement gagnant, 0 si au moins 2 cases adj vides jouables gagnantes (ie gagnant au prochain tour), -5 si au moins 1 accumulation (ie gagnant au prochain tour aussi) (faux dans les autres cas)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	retract(caseTest(X,Y,J)).
 
 gagneTest(X,Y,J,0):-retract(caseTest(X,Y,J)), false. %ménage

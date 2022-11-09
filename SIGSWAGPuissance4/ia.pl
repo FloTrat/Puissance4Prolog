@@ -3,6 +3,8 @@
 % - "Aléatoire" jouant aléatoirement ;
 % - "Minimax", implémentation de minimax assez paramétrable.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- module(ia, [iaAleatoire/1
 			  ,iaMinimax/5
 			  ,poidsPuissance3/1
@@ -13,6 +15,8 @@
 			  ,poidsTest/1
 			  ,poidsConf/1]
 ).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%%%%%
 %% Inclusions %%
@@ -30,9 +34,12 @@
 :- dynamic poidsPosition/1.
 :- dynamic poidsDensite/1.
 :- dynamic poidsAdjacence/1.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- dynamic poidsAlea/1.
 :- dynamic poidsTest/1.
 :- dynamic poidsConf/1.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%%%%%%%%%%%%
 %% Prédicats publics %%
@@ -46,6 +53,8 @@ iaAleatoire(Coup) :-
 iaAleatoire(Coup) :-
 	iaAleatoire(Coup).
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 iaMinimax(JoueurCourant,Coup,Profondeur,ChoixAlgo,ListEval) :-
 	memberRetInt(1,ListEval, EvalConf),
     memberRetInt(2,ListEval, EvalPosition),
@@ -75,3 +84,4 @@ iaMinimax(JoueurCourant,Coup,Profondeur,ChoixAlgo,ListEval) :-
 memberRetInt(_, [], 0).
 memberRetInt(X, [X|_], 1).
 memberRetInt(X, [_|Y], Res) :- memberRetInt(X,Y, Res).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

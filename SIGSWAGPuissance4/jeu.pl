@@ -8,11 +8,14 @@
 	case/3,
 	coupValide/1,
 	typeJoueur/2,
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	typeJoueurPreconf/5,
 	changerJoueur/0,
 	insererJeton/3,
 	typeHeuristique/2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ]).
+
 
 %%%%%%%%%%%%%%%%
 %% Inclusions %%
@@ -30,6 +33,7 @@
 %% Prédicats publics %%
 %%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Gestion des heuristiques %%%
 % Définitiion des heuristiques.
 typeHeuristique(1, 'evalConf').
@@ -90,6 +94,7 @@ changerJoueur :-
 	retractall(autreJoueur(_,_,_)),
 	assert(joueurCourant(rouge,TypeJoueurR, TypeEvalJoueurR)),
 	assert(autreJoueur(jaune,TypeJoueurJ, TypeEvalJoueurJ)),!.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%% Prédicats utiles

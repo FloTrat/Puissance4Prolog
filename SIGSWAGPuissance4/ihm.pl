@@ -1,10 +1,8 @@
-﻿%%%%%%%%%%%%%%
-%% DÉPRÉCIÉ %%
-%%%%%%%%%%%%%%
+﻿%%%%%%%%%%%% ihm.pl %%%%%%%%%%%%
 
-%%%%%%%%%%%% ihm.pl %%%%%%%%%%%%
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 :- module(ihm, [afficher/0, demandeCoup/3, afficherGagnant/4, afficherPartieNulle/0, demandeTypeDeJeu/2]).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 :- use_module(util).
 
@@ -47,15 +45,19 @@ afficherPartieNulle :-
 	nl,
 	write('Il y a egalite entre les 2 joueurs').
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 readEval(ListEval) :- read(X), evals(X,ListEval).
 evals(end,[]) :- !.
 evals(X,[X|ListEval]) :- read(Y), evals(Y,ListEval).
 
 emptyList([]).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % demandeTypeDeJeu/1(-TypeDeJeu)
 % Demande à l'utilisateur de saisir un type de jeu. N'échoue pas en cas d'entrée invalide (en dehors des valeurs possibles).
 % TypeDeJeu s'unifie au type saisi par l'utilisateur.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 demandeTypeDeJeu(TypeIA, TypeEval) :-
 	write('   --- Puissance 4 ---'), nl,
 	write('   --- Veuillez choisir une IA ---'), nl,
@@ -74,7 +76,8 @@ demandeTypeDeJeu(TypeIA, TypeEval) :-
 		write(' ----------------------- '), nl,
 		readEval(TypeEval)
 	;emptyList(TypeEval)).
-	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%%%%%%%%%%%
 %% Prédicats privés %%
@@ -115,6 +118,8 @@ afficherTypeJoueur(I,J) :-
 	typeJoueur(I,J),
 	write('\t'), write(I), write('. '), write(J), nl.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 afficherTypeHeuristique(I,J) :-
 	typeHeuristique(I,J),
 	write('\t'), write(I), write('. '), write(J), nl.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

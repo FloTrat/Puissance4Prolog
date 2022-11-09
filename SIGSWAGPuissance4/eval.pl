@@ -24,6 +24,9 @@
 evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
 	%write("X: "),write(X),write(" Y: "),write(Y),write(" "),
 	assert(ennemiTest(AutreJoueur)),
+	
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	poidsPuissance3(PoidsPuissance3), poidsPosition(PoidsPosition), poidsDensite(PoidsDensite), poidsAdjacence(PoidsAdjacence), poidsAlea(PoidsAlea), poidsTest(PoidsTest), poidsConf(PoidsConf),
 	evalPosition(JoueurCourant,Score1,PoidsPosition),
 	evalPuissances3(JoueurCourant,AutreJoueur,Score2,PoidsPuissance3),
@@ -41,6 +44,8 @@ evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
 			+ Score5 * PoidsTest
 			+ Score6 * PoidsConf
 			+ Perturbation * PoidsAlea. %bruit
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%%%%%%%%%%%
 %% Prédicats privés %%
@@ -77,8 +82,11 @@ evalCase(X,Y,Courant,ScoreCase) :-
 	Dx is X - CentreX,
 	Dy is Y - CentreY,
 	abs(Dx,AbsX),
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	abs(Dy,OrdY),
 	ScoreCase is ( 200/(AbsX+1) + 200/(OrdY+1) )*PonderationJoueur.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 ponderationJ(X,Y, Courant,1) :-
 	caseTest(X,Y,Courant), !.
@@ -111,13 +119,14 @@ evalCasesVides(Joueur,ScoreCase) :-
 	caseVideTest(X2,Y1),
 	caseTest(X2,Y2,_),
 	caseTest(X1,Y2,_),
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	(gagneTestDirect(X1,Y1,Joueur) -> ScoreCase1=100 ; ScoreCase1=0), % (If -> Then ; Else)
 	(gagneTestDirect(X2,Y1,Joueur) -> ScoreCase2=100 ; ScoreCase2=0),
 	ScoreCase is ScoreCase1+ScoreCase2.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%			HEURISTIQUE EN COURS DE TEST
+%			HEURISTIQUE EN COURS DE TEST                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % evalTest/4(+JoueurCourant,+AutreJoueur,-Score)
@@ -432,10 +441,12 @@ nombreCasesJoueurConf(X,Y,Joueur,DX,DY,TailleConf,NombreCases) :-
 	nombreCasesJoueurConf(X1,Y1,Joueur,DX,DY,T1,NombreCases).
 nombreCasesJoueurConf(X,Y,_,_,_,_,_) :-
 	ennemiTest(Ennemi),caseTest(X,Y,Ennemi), !, false.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%			HEURISTIQUE PAR ADJACENCE % ça marche peut-être (cf. Flo) --> bien reçu 👍
+%			HEURISTIQUE PAR ADJACENCE                        %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -458,7 +469,7 @@ caseAdjacente(X,Y,Joueur,Xadj,Yadj) :-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%			HEURISTIQUE PAR DENSITE DE PION %
+%			HEURISTIQUE PAR DENSITE DE PION                  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -504,11 +515,14 @@ gagneTestDirect(X,Y,J) :-
 gagneTestDirectLigne(X,Y,J) :-
 	decr(X,X1),
 	gaucheVerif(X1,Y,J,Rg),
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	incr(X,X2),
 	droiteVerif(X2,Y,J,Rd),
 	!,
 	Rf is Rg+Rd,
 	Rf>2.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ù%%
+
 
 gaucheVerif(X,Y,J,Rg):-
 	gauche(X,Y,J,0,Rg).
