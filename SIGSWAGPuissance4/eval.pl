@@ -25,8 +25,9 @@ evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
 	%write("X: "),write(X),write(" Y: "),write(Y),write(" "),
 	assert(ennemiTest(AutreJoueur)),
 	
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	poidsPuissance3(PoidsPuissance3), poidsPosition(PoidsPosition), poidsDensite(PoidsDensite), poidsAdjacence(PoidsAdjacence), poidsTest(PoidsTest), poidsConf(PoidsConf), pertubations(Pertubations),
 	evalPosition(JoueurCourant,Score1,PoidsPosition),
 	evalPuissances3(JoueurCourant,AutreJoueur,Score2,PoidsPuissance3),
@@ -44,89 +45,15 @@ evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
 			+ Score5 * PoidsTest
 			+ Score6 * PoidsConf
 			+ Perturbation * Pertubations.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%%%%%%%%%%%%%%%%%%%%%
 %% Prédicats privés %%
 %%%%%%%%%%%%%%%%%%%%%%
 
-% evalPosition/3(+Courant,-Score,+PoidsPosition)
-% Évalue en privilégiant les positions centrales en fonction de la pondération.
-% Score s'unifie à une valeur entre -400 et 400.
-evalPosition(Courant,Score,PoidsPosition) :-
-	PoidsPosition>0,
-	assert(nbCasesPleines(0)),
-	findall(S, evalCases(Courant,S), Scores),
-	sum(Scores, ScoreTot),
-	nbCasesPleines(NbCasesPleinesFinal),
-	retract(nbCasesPleines(NbCasesPleinesFinal)),
-	Score is ScoreTot / (NbCasesPleinesFinal+1).
-evalPosition(_,0,_).
-
-evalCases(Courant,ScoreCase) :-
-	caseTest(X,Y,_),
-	nbCasesPleines(NbCasesPleines),
-	retract(nbCasesPleines(NbCasesPleines)),
-	incr(NbCasesPleines,NbCasesPleinesF),
-	assert(nbCasesPleines(NbCasesPleinesF)),
-	evalCase(X,Y,Courant,ScoreCase).
-
-% renvoie un score entre -400 et 400
-evalCase(X,Y,Courant,ScoreCase) :-
-	nbColonnes(NBCOLONNES),
-	nbLignes(NBLIGNES),
-	ponderationJ(X, Y, Courant, PonderationJoueur),
-	CentreX is NBCOLONNES // 2 + 1,
-	CentreY is NBLIGNES // 2 + 1,
-	Dx is X - CentreX,
-	Dy is Y - CentreY,
-	abs(Dx,AbsX),
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	abs(Dy,OrdY),
-	ScoreCase is ( 200/(AbsX+1) + 200/(OrdY+1) )*PonderationJoueur.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-ponderationJ(X,Y, Courant,1) :-
-	caseTest(X,Y,Courant), !.
-ponderationJ(X,Y,_,-1) :-
-	ennemiTest(J),
-	caseTest(X,Y,J), !.
-ponderationJ(_,_,_,0).
-
-%%%%%%%%%%%%%%%%%%%%
-
-% evalPuissances3/3(+JoueurCourant,+AutreJoueur,-Score)
-% Évalue en cherchant les positions faisant gagner.
-% ScoreFinal s'unifie au score de la position.
-evalPuissances3(JoueurCourant,AutreJoueur,ScoreFinal,PoidsPuissance3) :-
-	PoidsPuissance3>0,
-	findall(S,evalCasesVides(JoueurCourant,S),ScoresCourant), sum(ScoresCourant,ScoreCourant),
-	findall(S,evalCasesVides(AutreJoueur,S),ScoresAutre), sum(ScoresAutre,ScoreAutre),
-	ScoreFinal is ScoreCourant - ScoreAutre.
-evalPuissances3(_,_,0,_).
-
-evalCasesVides(Joueur,ScoreCase) :-
-	nbColonnes(NBCOLONNES), nbLignes(NBLIGNES),
-	between(1,NBCOLONNES,X), between(1,NBLIGNES,Y),
-	caseTest(X,Y,Joueur),
-	incr(X,X1),
-	decr(X,X2),
-	incr(Y,Y1),
-	decr(Y,Y2),
-	caseVideTest(X1,Y1),
-	caseVideTest(X2,Y1),
-	caseTest(X2,Y2,_),
-	caseTest(X1,Y2,_),
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	(gagneTestDirect(X1,Y1,Joueur) -> ScoreCase1=100 ; ScoreCase1=0), % (If -> Then ; Else)
-	(gagneTestDirect(X2,Y1,Joueur) -> ScoreCase2=100 ; ScoreCase2=0),
-	ScoreCase is ScoreCase1+ScoreCase2.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%			HEURISTIQUE EN COURS DE TEST                     %
+%		HEURISTIQUE DE POTENTIEL PAR JETON DU JOUEUR         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % evalTest/4(+JoueurCourant,+AutreJoueur,-Score)
@@ -196,8 +123,8 @@ droiteVerifTest(X,_,_,X).
 gaucheVideTest(X,Y,J,GaucheV) :-
 	X > 1,
 	decr(X,X1),
-	%caseVideTest(X1,Y),!,
-	ennemiTest(Ennemi),not(caseTest(X1,Y,Ennemi)),!,
+	caseVideTest(X1,Y),!,
+	%ennemiTest(Ennemi),not(caseTest(X1,Y,Ennemi)),!,
 	gaucheVideTest(X1,Y,J,GaucheV).
 gaucheVideTest(X,_,_,X).
 
@@ -205,8 +132,8 @@ droiteVideTest(X,Y,J,DroiteV) :-
 	nbColonnes(NBCOLONNES),
 	X < NBCOLONNES,
 	incr(X,X1),
-	%caseVideTest(X1,Y),!,
-	ennemiTest(Ennemi),not(caseTest(X1,Y,Ennemi)),!,
+	caseVideTest(X1,Y),!,
+	%ennemiTest(Ennemi),not(caseTest(X1,Y,Ennemi)),!,
 	droiteVideTest(X1,Y,J,DroiteV).
 droiteVideTest(X,_,_,X).
 
@@ -364,7 +291,7 @@ droiteHautVideTest(X,Y,_,X,Y).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%			HEURISTIQUE EN COURS DE TEST - CONFIGURATIONS
+%			HEURISTIQUE CONFIGURATIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % evalConf/4(+JoueurCourant,+AutreJoueur,-Score)
@@ -441,6 +368,10 @@ nombreCasesJoueurConf(X,Y,Joueur,DX,DY,TailleConf,NombreCases) :-
 	nombreCasesJoueurConf(X1,Y1,Joueur,DX,DY,T1,NombreCases).
 nombreCasesJoueurConf(X,Y,_,_,_,_,_) :-
 	ennemiTest(Ennemi),caseTest(X,Y,Ennemi), !, false.
+
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fin de modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -499,6 +430,86 @@ zone(6,X,Y) :- X =<3, Y > 3.
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%			HEURISTIQUE POSITION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% evalPosition/3(+Courant,-Score,+PoidsPosition)
+% Évalue en privilégiant les positions centrales en fonction de la pondération.
+% Score s'unifie à une valeur entre -400 et 400.
+evalPosition(Courant,Score,PoidsPosition) :-
+	PoidsPosition>0,
+	assert(nbCasesPleines(0)),
+	findall(S, evalCases(Courant,S), Scores),
+	sum(Scores, ScoreTot),
+	nbCasesPleines(NbCasesPleinesFinal),
+	retract(nbCasesPleines(NbCasesPleinesFinal)),
+	Score is ScoreTot / (NbCasesPleinesFinal+1).
+evalPosition(_,0,_).
+
+evalCases(Courant,ScoreCase) :-
+	caseTest(X,Y,_),
+	nbCasesPleines(NbCasesPleines),
+	retract(nbCasesPleines(NbCasesPleines)),
+	incr(NbCasesPleines,NbCasesPleinesF),
+	assert(nbCasesPleines(NbCasesPleinesF)),
+	evalCase(X,Y,Courant,ScoreCase).
+
+% renvoie un score entre -400 et 400
+evalCase(X,Y,Courant,ScoreCase) :-
+	nbColonnes(NBCOLONNES),
+	nbLignes(NBLIGNES),
+	ponderationJ(X, Y, Courant, PonderationJoueur),
+	CentreX is NBCOLONNES // 2 + 1,
+	CentreY is NBLIGNES // 2 + 1,
+	Dx is X - CentreX,
+	Dy is Y - CentreY,
+	abs(Dx,AbsX),
+	abs(Dy,OrdY),
+	ScoreCase is ( 200/(AbsX+1) + 200/(OrdY+1) )*PonderationJoueur.
+
+
+ponderationJ(X,Y, Courant,1) :-
+	caseTest(X,Y,Courant), !.
+ponderationJ(X,Y,_,-1) :-
+	ennemiTest(J),
+	caseTest(X,Y,J), !.
+ponderationJ(_,_,_,0).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%			HEURISTIQUE PUISSANCE3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% evalPuissances3/3(+JoueurCourant,+AutreJoueur,-Score)
+% Évalue en cherchant les positions faisant gagner.
+% ScoreFinal s'unifie au score de la position.
+evalPuissances3(JoueurCourant,AutreJoueur,ScoreFinal,PoidsPuissance3) :-
+	PoidsPuissance3>0,
+	findall(S,evalCasesVides(JoueurCourant,S),ScoresCourant), sum(ScoresCourant,ScoreCourant),
+	findall(S,evalCasesVides(AutreJoueur,S),ScoresAutre), sum(ScoresAutre,ScoreAutre),
+	ScoreFinal is ScoreCourant - ScoreAutre.
+evalPuissances3(_,_,0,_).
+
+evalCasesVides(Joueur,ScoreCase) :-
+	nbColonnes(NBCOLONNES), nbLignes(NBLIGNES),
+	between(1,NBCOLONNES,X), between(1,NBLIGNES,Y),
+	caseTest(X,Y,Joueur),
+	incr(X,X1),
+	decr(X,X2),
+	incr(Y,Y1),
+	decr(Y,Y2),
+	caseVideTest(X1,Y1),
+	caseVideTest(X2,Y1),
+	caseTest(X2,Y2,_),
+	caseTest(X1,Y2,_),
+	(gagneTestDirect(X1,Y1,Joueur) -> ScoreCase1=100 ; ScoreCase1=0), % (If -> Then ; Else)
+	(gagneTestDirect(X2,Y1,Joueur) -> ScoreCase2=100 ; ScoreCase2=0),
+	ScoreCase is ScoreCase1+ScoreCase2.
+
 %%%%% gagneTestDirect %%%%%
 
 
@@ -515,13 +526,11 @@ gagneTestDirect(X,Y,J) :-
 gagneTestDirectLigne(X,Y,J) :-
 	decr(X,X1),
 	gaucheVerif(X1,Y,J,Rg),
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	incr(X,X2),
 	droiteVerif(X2,Y,J,Rd),
 	!,
 	Rf is Rg+Rd,
 	Rf>2.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%ù%%
 
 
 gaucheVerif(X,Y,J,Rg):-
@@ -607,6 +616,11 @@ droiteHaut(X,Y,J,R,Rg) :-
 	incr(X,X1),
 	incr(R,R1),
 	droiteHaut(X1,Y1,J,R1,Rg).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 
 %%%%%%% caseVideTest %%%%%
 % caseVideTest(+X,+Y)
