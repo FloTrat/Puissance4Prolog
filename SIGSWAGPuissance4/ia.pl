@@ -11,9 +11,10 @@
 			  ,poidsPosition/1
 			  ,poidsDensite/1
 			  ,poidsAdjacence/1
-			  ,poidsAlea/1
+			  ,pertubations/1
 			  ,poidsTest/1
-			  ,poidsConf/1]
+			  ,poidsConf/1
+			  ,testVictoireDirecte/1]
 ).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -34,8 +35,9 @@
 :- dynamic poidsPosition/1.
 :- dynamic poidsDensite/1.
 :- dynamic poidsAdjacence/1.
+:- dynamic pertubations/1.
+:- dynamic testVictoireDirecte/1.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-:- dynamic poidsAlea/1.
 :- dynamic poidsTest/1.
 :- dynamic poidsConf/1.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -57,29 +59,32 @@ iaAleatoire(Coup) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % iaMinimax(+Joueur,-Coup,+Profondeur,+ChoixAlgo,+ListEval)
 iaMinimax(JoueurCourant,Coup,Profondeur,ChoixAlgo,ListEval) :-
+	memberRetInt(0,ListEval, TestVictoireDirecte),
 	memberRetInt(1,ListEval, EvalConf),
     memberRetInt(2,ListEval, EvalPosition),
     memberRetInt(3,ListEval, EvalPuissances3),
     memberRetInt(4,ListEval, EvalDensite),
     memberRetInt(5,ListEval, EvalAdjacence),
     memberRetInt(6,ListEval, EvalTest),
-    memberRetInt(7,ListEval, EvalAlea),
+    memberRetInt(7,ListEval, Pertubations),
 
+    assert(testVictoireDirecte(TestVictoireDirecte)),
     assert(poidsConf(EvalConf)),
     assert(poidsPosition(EvalPosition)),
     assert(poidsPuissance3(EvalPuissances3)),
     assert(poidsDensite(EvalDensite)),
     assert(poidsAdjacence(EvalAdjacence)),
     assert(poidsTest(EvalTest)),
-    assert(poidsAlea(EvalAlea)),
+    assert(pertubations(Pertubations)),
 	parcoursArbre(JoueurCourant,Profondeur,ChoixAlgo,Coup,_),
+    retract(testVictoireDirecte(TestVictoireDirecte)),
     retract(poidsConf(EvalConf)),
     retract(poidsPosition(EvalPosition)),
     retract(poidsPuissance3(EvalPuissances3)),
     retract(poidsDensite(EvalDensite)),
     retract(poidsAdjacence(EvalAdjacence)),
     retract(poidsTest(EvalTest)),
-    retract(poidsAlea(EvalAlea)).
+    retract(pertubations(Pertubations)).
 
 
 memberRetInt(_, [], 0).

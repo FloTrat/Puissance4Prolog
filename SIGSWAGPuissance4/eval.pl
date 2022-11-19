@@ -27,7 +27,7 @@ evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
 	
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	poidsPuissance3(PoidsPuissance3), poidsPosition(PoidsPosition), poidsDensite(PoidsDensite), poidsAdjacence(PoidsAdjacence), poidsAlea(PoidsAlea), poidsTest(PoidsTest), poidsConf(PoidsConf),
+	poidsPuissance3(PoidsPuissance3), poidsPosition(PoidsPosition), poidsDensite(PoidsDensite), poidsAdjacence(PoidsAdjacence), poidsTest(PoidsTest), poidsConf(PoidsConf), pertubations(Pertubations),
 	evalPosition(JoueurCourant,Score1,PoidsPosition),
 	evalPuissances3(JoueurCourant,AutreJoueur,Score2,PoidsPuissance3),
 	densite(JoueurCourant,Score3,PoidsDensite),
@@ -43,7 +43,7 @@ evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
 			+ Score4 * PoidsAdjacence
 			+ Score5 * PoidsTest
 			+ Score6 * PoidsConf
-			+ Perturbation * PoidsAlea. %bruit
+			+ Perturbation * Pertubations.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 

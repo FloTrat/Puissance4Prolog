@@ -36,13 +36,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Gestion des heuristiques %%%
 % Définitiion des heuristiques.
+typeHeuristique(0, 'victoireDirecte').
 typeHeuristique(1, 'evalConf').
 typeHeuristique(2, 'evalPosition').
 typeHeuristique(3, 'evalPuissances3').
 typeHeuristique(4, 'densite').
 typeHeuristique(5, 'evalAdjacence').
 typeHeuristique(6, 'evalTest').
-typeHeuristique(7, 'poidsAlea').
+typeHeuristique(7, 'pertubations').
 
 %%% Gestion des joueurs %%%
 

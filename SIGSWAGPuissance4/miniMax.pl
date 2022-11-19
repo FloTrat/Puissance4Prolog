@@ -11,6 +11,7 @@
 
 :- use_module(util).
 :- use_module(eval).
+:- use_module(ia).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Prédicats dynamiques %%
@@ -45,9 +46,9 @@ parcoursArbre(J,Pmax,2,BestX,BestScore) :-
 
 % bestScoreColAB/6(+Col,+P,-BestScore,-BestX,+Alpha,+Beta)
 bestScoreColAB(1,Pmax,BestScore,[1],Alpha,Beta) :-
-	parcoursNewAB(1,Pmax,BestScore,Alpha,Beta).
+	parcoursAB(1,Pmax,BestScore,Alpha,Beta).
 bestScoreColAB(X,Pmax,BestScore,BestXList,Alpha,Beta) :-
-	parcoursNewAB(X,Pmax,ScoreX,Alpha,Beta),
+	parcoursAB(X,Pmax,ScoreX,Alpha,Beta),
 	%write("X: "),write(X),write(" Score: "),write(ScoreX),nl,
 	coupureAB(X,ScoreX,Pmax,BestXList,BestScore,Alpha,Beta).
 
@@ -73,14 +74,15 @@ coupureAB(X,ScoreX,Pmax,BestXList,BestScore,Alpha,Beta):-
 	bestScoreColAB(X1,Pmax,BestScoreX1,BestX1List,Alpha,NewBeta),
 	compScore(X,ScoreX,BestX1List,BestScoreX1,BestXList,BestScore).
 
-% parcoursNewAB/5(+X,+P,-BestScoreX,+Alpha,+Beta)
-parcoursNewAB(X,_,ScoreX,_,_) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,ScoreX).
-parcoursNewAB(X,_,ScoreX,_,_) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), not(maximizer(Joue)), infinitePos(2,ScoreX).
-parcoursNewAB(X,_,ScoreX,_,_) :- nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), evaluate(X,NBLIGNES,Joue,ScoreX).
-%parcoursNewAB(X, P, ScoreX,_,_):-
-%	joueurCourant(Joue), calculPositionJeton(X, 1, Y), gagneTest(X,Y,Joue,Direct), victoireDirecte(X,Y,Joue,P,Direct,ScoreX).
-parcoursNewAB(X,1,ScoreX,_,_) :- joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, ScoreX), retract(caseTest(X,Y,Joue)).
-parcoursNewAB(X,P,BestScore,Alpha,Beta) :-
+% parcoursAB/5(+X,+P,-BestScoreX,+Alpha,+Beta)
+parcoursAB(X,_,ScoreX,_,_) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,ScoreX).
+parcoursAB(X,_,ScoreX,_,_) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), not(maximizer(Joue)), infinitePos(2,ScoreX).
+parcoursAB(X,_,ScoreX,_,_) :- nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), evaluate(X,NBLIGNES,Joue,ScoreX).
+parcoursAB(X, P, ScoreX,_,_):-
+	testVictoireDirecte(TestVictoireDirecte), TestVictoireDirecte>0,
+	joueurCourant(Joue), calculPositionJeton(X, 1, Y), gagneTest(X,Y,Joue,Direct), victoireDirecte(X,Y,Joue,P,Direct,ScoreX).
+parcoursAB(X,1,ScoreX,_,_) :- joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, ScoreX), retract(caseTest(X,Y,Joue)).
+parcoursAB(X,P,BestScore,Alpha,Beta) :-
 	%write("X: "),write(X),write(" P: "),write(P),nl,
 	joueurCourant(J),
 	placerJeton(X,Y,J),
@@ -93,16 +95,16 @@ parcoursNewAB(X,P,BestScore,Alpha,Beta) :-
 
 % bestScoreCol/4(+X,+P,-BestScore,-BestXList)
 bestScoreCol(1,Pmax,BestScore,[1]) :-
-	parcoursNew(1,Pmax,BestScore).
+	parcours(1,Pmax,BestScore).
 	%write("X: "),write(1),write(" Score: "),write(BestScore),nl,!.
 bestScoreCol(X,Pmax,BestScore,BestXList) :- % pour afficher le score final pour chaque colonne
-	parcoursNew(X,Pmax,ScoreX),
+	parcours(X,Pmax,ScoreX),
 	%write("X: "),write(X),write(" Score: "),write(ScoreX),nl,
 	decr(X,X1),
 	bestScoreCol(X1,Pmax,BestScoreX1,BestX1List),
 	compScore(X,ScoreX,BestX1List,BestScoreX1,BestXList,BestScore).
 bestScoreCol(X,Pmax,BestScore,BestXList) :-
-	parcoursNew(X,Pmax,ScoreX),
+	parcours(X,Pmax,ScoreX),
 	%write("P: "),write(Pmax),write(" X: "),write(X),write(" Score: "),write(ScoreX),nl,
 	decr(X,X1),
 	bestScoreCol(X1,Pmax,BestScoreX1,BestX1List),
@@ -119,14 +121,15 @@ compScore(X,ScoreX,_,ScoreX1,[X],ScoreX) :-
 	ScoreX < ScoreX1.
 compScore(_,_,X1List,ScoreX1,X1List,ScoreX1).
 
-% parcoursNew/3(+X,+P,-BestScoreX)
-parcoursNew(X,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,ScoreX).
-parcoursNew(X,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), not(maximizer(Joue)), infinitePos(2,ScoreX).
-parcoursNew(X,_,ScoreX) :- nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), evaluate(X,NBLIGNES,Joue,ScoreX).
-%parcoursNew(X, P, ScoreX):-
-%	joueurCourant(Joue), calculPositionJeton(X, 1, Y), gagneTest(X,Y,Joue,Direct), victoireDirecte(X,Y,Joue,P,Direct,ScoreX).
-parcoursNew(X,1,ScoreX) :- joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, ScoreX), retract(caseTest(X,Y,Joue)).
-parcoursNew(X,P,BestScore) :-
+% parcours/3(+X,+P,-BestScoreX)
+parcours(X,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,ScoreX).
+parcours(X,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), not(maximizer(Joue)), infinitePos(2,ScoreX).
+parcours(X,_,ScoreX) :- nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), evaluate(X,NBLIGNES,Joue,ScoreX).
+parcours(X, P, ScoreX):-
+	testVictoireDirecte(TestVictoireDirecte), TestVictoireDirecte>0,
+	joueurCourant(Joue), calculPositionJeton(X, 1, Y), gagneTest(X,Y,Joue,Direct), victoireDirecte(X,Y,Joue,P,Direct,ScoreX).
+parcours(X,1,ScoreX) :- joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, ScoreX), retract(caseTest(X,Y,Joue)).
+parcours(X,P,BestScore) :-
 	%write("X: "),write(X),write(" P: "),write(P),nl,
 	joueurCourant(J),
 	placerJeton(X,Y,J),
@@ -136,7 +139,7 @@ parcoursNew(X,P,BestScore) :-
 	bestScoreCol(NBCOLONNES,NewP,BestScore,_),
 	changerJoueur,
 	retract(caseTest(X,Y,J)).
-/*
+
 victoireDirecte(_,_,J,P,1,Value):- maximizer(J), Pp is 1-P, infinitePos(Pp,Value). %Victoire du max
 victoireDirecte(_,_,J,P,1,Value):- not(maximizer(J)), Pp is 1-P, infiniteNeg(Pp,Value). %Victoire du min
 
@@ -161,7 +164,7 @@ victoireDirecte(X,Y,J,P,-5,Value):- not(maximizer(J)), Pp is -5-P, infiniteNeg(P
 	retract(caseTest(X,Y,J)). %Victoire anticipée du min
 
 victoireDirecte(X,Y,J,_,-5,_):- retract(caseTest(X,Y,J)), false. %ménage si on perde derrière
-*/
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
