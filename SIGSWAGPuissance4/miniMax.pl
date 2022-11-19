@@ -22,114 +22,109 @@
 %% Prédicats publics %%
 %%%%%%%%%%%%%%%%%%%%%%%
 
-% parcoursArbre/4(+J,+Pmax,+ChoixAlgo,-R,-Value)
-% Parcours l'arbre de jeu en évaluant les feuilles grâces aux différentes fonctions d'évaluation. +J : joueur devant jouer, +Pmax : profondeur maximale, -R : le coup à jouer, -Value : évaluation du noeud courant.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-parcoursArbre(J,Pmax,0,R,Value) :-
-	initCaseTest,infinitePos(InfP),infiniteNeg(InfN),assert(maximizer(J)), assert(joueurCourant(J)),
-	parcours(1,1,Pmax,[1,0],InfP,InfN), feuille([1,0],X1),
-	setJoueur(1), parcours(2,1,Pmax,[2,0],InfP,X1), feuille([2,0],X2),
-	setJoueur(1), AlphaNext is max(X1,X2), parcours(3,1,Pmax,[3,0],InfP,AlphaNext), feuille([3,0],X3),
-	setJoueur(1), AlphaNext1 is max(AlphaNext,X3), parcours(4,1,Pmax,[4,0],InfP,AlphaNext1), feuille([4,0],X4),
-	setJoueur(1), AlphaNext2 is max(AlphaNext1,X4), parcours(5,1,Pmax,[5,0],InfP,AlphaNext2), feuille([5,0],X5),
-	setJoueur(1), AlphaNext3 is max(AlphaNext2,X5), parcours(6,1,Pmax,[6,0],InfP,AlphaNext3), feuille([6,0],X6),
-	setJoueur(1), AlphaNext4 is max(AlphaNext3,X6), parcours(7,1,Pmax,[7,0],InfP,AlphaNext4), feuille([7,0],X7),
-	%write(X1),write(" "),write(X2),write(" "),write(X3),write(" "),write(X4),write(" "),write(X5),write(" "),write(X6),write(" "),write(X7),nl,
-	coupAJouerMaximizer([X1,X2,X3,X4,X5,X6,X7],R,Value), clearTest,!. % the second call and the next ones are called with the result of the preceding (we take the max of all of them) on reset le joueur entre chaque call
-
+% parcoursArbre/5(+Joueur,+Pmax,+ChoixAlgo,-BestX,-BestScore)
 parcoursArbre(J,Pmax,1,BestX,BestScore) :-
 	initCaseTest,assert(maximizer(J)), assert(joueurCourant(J)),
 	nbColonnes(NBCOLONNES),
-	bestScoreCol(NBCOLONNES,Pmax,BestScore,BestX,1),
+	bestScoreCol(NBCOLONNES,Pmax,BestScore,BestXList),
+	random_member(BestX, BestXList),
 	%write("BestX: "), write(BestX), write(" Score: "), write(BestScore), nl,
 	clearTest,!.
 
-/*
 parcoursArbre(J,Pmax,2,BestX,BestScore) :-
 	initCaseTest,assert(maximizer(J)), assert(joueurCourant(J)),
 	nbColonnes(NBCOLONNES),
 	infiniteNeg(Alpha),
 	infinitePos(Beta),
-	bestScoreColAB(NBCOLONNES,Pmax,BestScore,BestX,_,_),
+	bestScoreColAB(NBCOLONNES,Pmax,BestScore,BestXList,Alpha,Beta),
+	random_member(BestX, BestXList),
 	%write("BestX: "), write(BestX), write(" Score: "), write(BestScore), nl,
 	clearTest,!.
 
-bestScoreColAB(0,_,BestScore,0,_,BestScore,-BestScore) :- 
-	joueurCourant(J), maximizer(J), infiniteNeg(BestScore).
-bestScoreColAB(0,_,BestScore,0,_,BestScore,-BestScore) :- 
-	infinitePos(BestScore).
-bestScoreColAB(X,Pmax,BestScore,BestX,1,Alpha,Beta) :- % pour afficher le score final pour chaque colonne
-	joueurCourant(J), maximizer(J),
-	parcoursNewAB(X,Pmax,ScoreX),
+% bestScoreColAB/6(+Col,+P,-BestScore,-BestX,+Alpha,+Beta)
+bestScoreColAB(1,Pmax,BestScore,[1],Alpha,Beta) :-
+	parcoursNewAB(1,Pmax,BestScore,Alpha,Beta).
+bestScoreColAB(X,Pmax,BestScore,BestXList,Alpha,Beta) :-
+	parcoursNewAB(X,Pmax,ScoreX,Alpha,Beta),
 	%write("X: "),write(X),write(" Score: "),write(ScoreX),nl,
-	decr(X,X1),
-	bestScoreColAB(X1,Pmax,BestScoreX1,BestX1,1,Alpha,Beta),
-	compScore(X,ScoreX,BestX1,BestScoreX1,BestX,BestScore),
-	compAB(BestScore,).
-bestScoreColAB(X,Pmax,BestScore,BestX,1,Alpha,Beta) :- % pour afficher le score final pour chaque colonne
-	parcoursNewAB(X,Pmax,ScoreX),
-	%write("X: "),write(X),write(" Score: "),write(ScoreX),nl,
-	decr(X,X1),
-	bestScoreColAB(X1,Pmax,BestScoreX1,BestX1,1,Alpha,Beta),
-	compScore(X,ScoreX,BestX1,BestScoreX1,BestX,BestScore).
-bestScoreColAB(X,Pmax,BestScore,BestX,0,Alpha,Beta) :-
-	parcoursNewAB(X,Pmax,ScoreX),
-	%write("P: "),write(Pmax),write(" X: "),write(X),write(" Score: "),write(ScoreX),nl,
-	decr(X,X1),
-	bestScoreColAB(X1,Pmax,BestScoreX1,BestX1,0,Alpha,Beta),
-	compScore(X,ScoreX,BestX1,BestScoreX1,BestX,BestScore).
+	coupureAB(X,ScoreX,Pmax,BestXList,BestScore,Alpha,Beta).
 
-parcoursNewAB(X,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,ScoreX).
-parcoursNewAB(X,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), not(maximizer(Joue)), infinitePos(2,ScoreX).
-parcoursNewAB(X,_,ScoreX) :- nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), evaluate(X,NBLIGNES,Joue,ScoreX).
-%parcoursNewAB(X, P, ScoreX):-
-%	joueurCourant(Joue), calculPositionJeton(X, 1, Y), gagneTest(X,Y,Joue,Direct), victoireDirecteNew(X,Y,Joue,P,Direct,ScoreX).
-parcoursNewAB(X,1,ScoreX) :- joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, ScoreX), retract(caseTest(X,Y,Joue)).
-parcoursNewAB(X,P,BestScore) :-
+% coupureAB/7(+X,+ScoreX,+Pmax,-BestXList,-BestScore,+Alpha,+Beta).
+coupureAB(X,ScoreX,_,[X],ScoreX,_,Beta):-
+	% coupure Beta
+	joueurCourant(J), maximizer(J),
+	ScoreX > Beta.
+coupureAB(X,ScoreX,Pmax,BestXList,BestScore,Alpha,Beta):-
+	joueurCourant(J), maximizer(J),
+	decr(X,X1),
+	NewAlpha is max(Alpha,ScoreX),
+	bestScoreColAB(X1,Pmax,BestScoreX1,BestX1List,NewAlpha,Beta),
+	compScore(X,ScoreX,BestX1List,BestScoreX1,BestXList,BestScore).
+coupureAB(X,ScoreX,_,[X],ScoreX,Alpha,_):-
+	% coupure Alpha
+	joueurCourant(J), not(maximizer(J)),
+	ScoreX < Alpha.
+coupureAB(X,ScoreX,Pmax,BestXList,BestScore,Alpha,Beta):-
+	joueurCourant(J), not(maximizer(J)),
+	decr(X,X1),
+	NewBeta is min(Beta,ScoreX),
+	bestScoreColAB(X1,Pmax,BestScoreX1,BestX1List,Alpha,NewBeta),
+	compScore(X,ScoreX,BestX1List,BestScoreX1,BestXList,BestScore).
+
+% parcoursNewAB/5(+X,+P,-BestScoreX,+Alpha,+Beta)
+parcoursNewAB(X,_,ScoreX,_,_) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,ScoreX).
+parcoursNewAB(X,_,ScoreX,_,_) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), not(maximizer(Joue)), infinitePos(2,ScoreX).
+parcoursNewAB(X,_,ScoreX,_,_) :- nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), evaluate(X,NBLIGNES,Joue,ScoreX).
+%parcoursNewAB(X, P, ScoreX,_,_):-
+%	joueurCourant(Joue), calculPositionJeton(X, 1, Y), gagneTest(X,Y,Joue,Direct), victoireDirecte(X,Y,Joue,P,Direct,ScoreX).
+parcoursNewAB(X,1,ScoreX,_,_) :- joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, ScoreX), retract(caseTest(X,Y,Joue)).
+parcoursNewAB(X,P,BestScore,Alpha,Beta) :-
 	%write("X: "),write(X),write(" P: "),write(P),nl,
 	joueurCourant(J),
 	placerJeton(X,Y,J),
 	nbColonnes(NBCOLONNES),
 	decr(P,NewP),
 	changerJoueur,
-	bestScoreColAB(NBCOLONNES,NewP,BestScore,_,0,Alpha,Beta),
+	bestScoreColAB(NBCOLONNES,NewP,BestScore,_,Alpha,Beta),
 	changerJoueur,
 	retract(caseTest(X,Y,J)).
-*/
 
-bestScoreCol(1,Pmax,BestScore,1,_) :-
+% bestScoreCol/4(+X,+P,-BestScore,-BestXList)
+bestScoreCol(1,Pmax,BestScore,[1]) :-
 	parcoursNew(1,Pmax,BestScore).
 	%write("X: "),write(1),write(" Score: "),write(BestScore),nl,!.
-bestScoreCol(X,Pmax,BestScore,BestX,1) :- % pour afficher le score final pour chaque colonne
+bestScoreCol(X,Pmax,BestScore,BestXList) :- % pour afficher le score final pour chaque colonne
 	parcoursNew(X,Pmax,ScoreX),
 	%write("X: "),write(X),write(" Score: "),write(ScoreX),nl,
 	decr(X,X1),
-	bestScoreCol(X1,Pmax,BestScoreX1,BestX1,1),
-	compScore(X,ScoreX,BestX1,BestScoreX1,BestX,BestScore).
-bestScoreCol(X,Pmax,BestScore,BestX,0) :-
+	bestScoreCol(X1,Pmax,BestScoreX1,BestX1List),
+	compScore(X,ScoreX,BestX1List,BestScoreX1,BestXList,BestScore).
+bestScoreCol(X,Pmax,BestScore,BestXList) :-
 	parcoursNew(X,Pmax,ScoreX),
 	%write("P: "),write(Pmax),write(" X: "),write(X),write(" Score: "),write(ScoreX),nl,
 	decr(X,X1),
-	bestScoreCol(X1,Pmax,BestScoreX1,BestX1,0),
-	compScore(X,ScoreX,BestX1,BestScoreX1,BestX,BestScore).
+	bestScoreCol(X1,Pmax,BestScoreX1,BestX1List),
+	compScore(X,ScoreX,BestX1List,BestScoreX1,BestXList,BestScore).
 
-compScore(X,ScoreX,X1,ScoreX,XRand,ScoreX) :-
-	random_member(XRand,[X,X1]).
-compScore(X,ScoreX,_,ScoreX1,X,ScoreX) :-
+% compScore/6(+X,+ScoreX,+X1List,+ScoreX1,-BestXList,-BestScore)
+compScore(X,ScoreX,X1List,ScoreX,[X|X1List],ScoreX).
+compScore(X,ScoreX,_,ScoreX1,[X],ScoreX) :-
 	joueurCourant(J), maximizer(J),
 	ScoreX > ScoreX1.
-compScore(_,_,X1,ScoreX1,X1,ScoreX1) :-
+compScore(_,_,X1List,ScoreX1,X1List,ScoreX1) :-
 	joueurCourant(J), maximizer(J).
-compScore(X,ScoreX,_,ScoreX1,X,ScoreX) :-
+compScore(X,ScoreX,_,ScoreX1,[X],ScoreX) :-
 	ScoreX < ScoreX1.
-compScore(_,_,X1,ScoreX1,X1,ScoreX1).
+compScore(_,_,X1List,ScoreX1,X1List,ScoreX1).
 
+% parcoursNew/3(+X,+P,-BestScoreX)
 parcoursNew(X,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,ScoreX).
 parcoursNew(X,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), not(maximizer(Joue)), infinitePos(2,ScoreX).
 parcoursNew(X,_,ScoreX) :- nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), evaluate(X,NBLIGNES,Joue,ScoreX).
 %parcoursNew(X, P, ScoreX):-
-%	joueurCourant(Joue), calculPositionJeton(X, 1, Y), gagneTest(X,Y,Joue,Direct), victoireDirecteNew(X,Y,Joue,P,Direct,ScoreX).
+%	joueurCourant(Joue), calculPositionJeton(X, 1, Y), gagneTest(X,Y,Joue,Direct), victoireDirecte(X,Y,Joue,P,Direct,ScoreX).
 parcoursNew(X,1,ScoreX) :- joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, ScoreX), retract(caseTest(X,Y,Joue)).
 parcoursNew(X,P,BestScore) :-
 	%write("X: "),write(X),write(" P: "),write(P),nl,
@@ -138,34 +133,34 @@ parcoursNew(X,P,BestScore) :-
 	nbColonnes(NBCOLONNES),
 	decr(P,NewP),
 	changerJoueur,
-	bestScoreCol(NBCOLONNES,NewP,BestScore,_,0),
+	bestScoreCol(NBCOLONNES,NewP,BestScore,_),
 	changerJoueur,
 	retract(caseTest(X,Y,J)).
 /*
-victoireDirecteNew(_,_,J,P,1,Value):- maximizer(J), Pp is 1-P, infinitePos(Pp,Value). %Victoire du max
-victoireDirecteNew(_,_,J,P,1,Value):- not(maximizer(J)), Pp is 1-P, infiniteNeg(Pp,Value). %Victoire du min
+victoireDirecte(_,_,J,P,1,Value):- maximizer(J), Pp is 1-P, infinitePos(Pp,Value). %Victoire du max
+victoireDirecte(_,_,J,P,1,Value):- not(maximizer(J)), Pp is 1-P, infiniteNeg(Pp,Value). %Victoire du min
 
-victoireDirecteNew(X,Y,J,_,0,_):- assert(caseTest(X,Y,J)), false.
+victoireDirecte(X,Y,J,_,0,_):- assert(caseTest(X,Y,J)), false.
 
-victoireDirecteNew(X,Y,J,P,0,Value):- maximizer(J), Pp is -P, infinitePos(Pp,Value),
+victoireDirecte(X,Y,J,P,0,Value):- maximizer(J), Pp is -P, infinitePos(Pp,Value),
 	autreJoueur(J2), testDefaiteProchaine(J2),
 	retract(caseTest(X,Y,J)). %Victoire anticipée du max
-victoireDirecteNew(X,Y,J,P,0,Value):- not(maximizer(J)), Pp is -P, infiniteNeg(Pp,Value),
+victoireDirecte(X,Y,J,P,0,Value):- not(maximizer(J)), Pp is -P, infiniteNeg(Pp,Value),
 	autreJoueur(J2), testDefaiteProchaine(J2),
 	retract(caseTest(X,Y,J)). %Victoire anticipée du min
 
-victoireDirecteNew(X,Y,J,_,0,_):- retract(caseTest(X,Y,J)), false. %ménage si on perde derrière
+victoireDirecte(X,Y,J,_,0,_):- retract(caseTest(X,Y,J)), false. %ménage si on perde derrière
 
-victoireDirecteNew(X,Y,J,_,-5,_):- assert(caseTest(X,Y,J)), false.
+victoireDirecte(X,Y,J,_,-5,_):- assert(caseTest(X,Y,J)), false.
 
-victoireDirecteNew(X,Y,J,P,-5,Value):- maximizer(J), Pp is -5-P, infinitePos(Pp,Value),
+victoireDirecte(X,Y,J,P,-5,Value):- maximizer(J), Pp is -5-P, infinitePos(Pp,Value),
 	autreJoueur(J2), testDefaiteAnticipeeProchaine(J2),
 	retract(caseTest(X,Y,J)). %Victoire anticipée du max
-victoireDirecteNew(X,Y,J,P,-5,Value):- not(maximizer(J)), Pp is -5-P, infiniteNeg(Pp,Value),
+victoireDirecte(X,Y,J,P,-5,Value):- not(maximizer(J)), Pp is -5-P, infiniteNeg(Pp,Value),
 	autreJoueur(J2), testDefaiteAnticipeeProchaine(J2),
 	retract(caseTest(X,Y,J)). %Victoire anticipée du min
 
-victoireDirecteNew(X,Y,J,_,-5,_):- retract(caseTest(X,Y,J)), false. %ménage si on perde derrière
+victoireDirecte(X,Y,J,_,-5,_):- retract(caseTest(X,Y,J)), false. %ménage si on perde derrière
 */
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -181,95 +176,6 @@ clearTest :-
 	retractall(caseTest(X,Y,_)),
 	retractall(feuille(X,Y)),
 	retract(maximizer(X)), retract(joueurCourant(_)). % on eve tout ce que l'on a ajouté.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% parcours/6(+X, +Profondeur, +ProfondeurMax, +???, +Alpha, +Beta)
-parcours(X, _, _, L, _, _) :-
-	nbLignes(MaxLignes),case(X,MaxLignes,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,Value), assert(feuille(L, Value)). % on ne peut PAS jouer, on met -infini
-parcours(X, _, _, L, _, _):-
-	nbLignes(MaxLignes),case(X,MaxLignes,_), joueurCourant(Joue), not(maximizer(Joue)), infinitePos(2,Value), assert(feuille(L, Value)). % on ne peut PAS jouer, on met +infini
-parcours(X, _, _, L, _, _):-
-	nbLignes(MaxLignes),caseTest(X,MaxLignes,_), joueurCourant(Joue), evaluate(X,MaxLignes,Joue,Value), assert(feuille(L, Value)) .% on ne peut plus jouer, on met une feuille (on évalue)
-parcours(X, P, _, L, _, _):-
-	joueurCourant(Joue), calculPositionJeton(X, 1, Y), gagneTest(X,Y,Joue,Direct), victoireDirecte(X,Y,Joue,L,P,Direct).
-
-parcours(X, P, Pmax, L, _, _):- P==Pmax,joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, Value), retract(caseTest(X,Y,Joue)), assert(feuille(L, Value)). % on est à la prof max, on evalue et on met une feuille
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-parcours(X, P, Pmax, L, Beta, Alpha) :- incr(P, P1),joueurCourant(Joue), placerJeton(X,Y,Joue), %on incremente la profondeur, puis on joue un coup(qui réussit a tous les coups)
-	setJoueur(P1), %on set le joueur
-	attribueVal(ValeurPrec), % on initialise val
-	parcours(1, P1,Pmax, [1|L], Beta, Alpha), %on joue colonne 1
-	feuille([1|L], Valeur1),%here is the value of first branch
-
-	%write("ValeurPrec: "),write(ValeurPrec),nl,
-
-	%write("Valeur1: "),write(Valeur1),write(" B: "),write(Beta),write(" A: "),write(Alpha),nl,
-
-	setJoueur(P1), % on reset le joueur (il a changé dans le premier parcours)
-	choixVal(Valeur1,ValeurPrec,Val1),%choisit si min ou max, renvoie la valeur pour le prochain coup.
-
-	joueCoupSuivant(Val1,2,P1,Pmax,L,Beta,Alpha,Val2,Beta2,Alpha2),%on tente le coup suivant (ou pas si élagage), avec la valeur retournée par le précédent
-	setJoueur(P1), % on reset le joueur (il a changé dans le premier parcours)
-
-	%write("Val2: "),write(Val2),write(" B: "),write(Beta2),write(" A: "),write(Alpha2),nl,
-
-	joueCoupSuivant(Val2,3,P1,Pmax,L,Beta2,Alpha2,Val3,Beta3,Alpha3),%on tente le coup suivant (ou pas si élagage), avec la valeur retournée par le précédent
-	setJoueur(P1), %on change de joueur
-
-	%write("Val3: "),write(Val3),write(" B: "),write(Beta3),write(" A: "),write(Alpha3),nl,
-
-	joueCoupSuivant(Val3,4,P1,Pmax,L,Beta3,Alpha3,Val4,Beta4,Alpha4),%on tente le coup suivant (ou pas si élagage), avec la valeur retournée par le précédent
-	setJoueur(P1), %on change de joueur
-
-	%write("Val4: "),write(Val4),write(" B: "),write(Beta4),write(" A: "),write(Alpha4),nl,
-
-	joueCoupSuivant(Val4,5,P1,Pmax,L,Beta4,Alpha4,Val5,Beta5,Alpha5),%on tente le coup suivant (ou pas si élagage), avec la valeur retournée par le précédent
-	setJoueur(P1), %on change de joueur
-
-	%write("Val5: "),write(Val5),write(" B: "),write(Beta5),write(" A: "),write(Alpha5),nl,
-
-	joueCoupSuivant(Val5,6,P1,Pmax,L,Beta5,Alpha5,Val6,Beta6,Alpha6),%on tente le coup suivant (ou pas si élagage), avec la valeur retournée par le précédent
-	setJoueur(P1), %on change de joueur
-
-	%write("Val6: "),write(Val6),write(" B: "),write(Beta6),write(" A: "),write(Alpha6),nl,
-
-	joueCoupSuivant(Val6,7,P1,Pmax,L,Beta6,Alpha6,Valeur,_,_),%on tente le coup suivant (ou pas si élagage), avec la valeur retournée par le précédent
-	setJoueur(P1), %on change de joueur
-
-	%write("Valeur: "),write(Valeur),nl,
-
-	retract(caseTest(X,Y,Joue)), %on annule le coup pour poursuivre dans l'arbre
-	feuille([1|L], _),feuille([2|L], _), %on cherche les feuilles associées (elles ont été calculées plus bas dans l'arbre)
-	setJoueur(P1), %on change de joueur
-	assert(feuille(L,Valeur)),joueurCourant(_). %on met notre feuille calculée
-
-
-victoireDirecte(_,_,J,L,P,1):- maximizer(J), Pp is 1-P, infinitePos(Pp,Value), assert(feuille(L, Value)). %Victoire du max
-victoireDirecte(_,_,J,L,P,1):- not(maximizer(J)), Pp is 1-P, infiniteNeg(Pp,Value), assert(feuille(L, Value)). %Victoire du min
-
-victoireDirecte(X,Y,J,_,_,0):- assert(caseTest(X,Y,J)), false.
-
-victoireDirecte(X,Y,J,L,P,0):- maximizer(J), Pp is -P, infinitePos(Pp,Value),
-	autreJoueur(J2), testDefaiteProchaine(J2),
-	assert(feuille(L, Value)), retract(caseTest(X,Y,J)). %Victoire anticipée du max
-victoireDirecte(X,Y,J,L,P,0):- not(maximizer(J)), Pp is -P, infiniteNeg(Pp,Value),
-	autreJoueur(J2), testDefaiteProchaine(J2),
-	assert(feuille(L, Value)), retract(caseTest(X,Y,J)). %Victoire anticipée du min
-
-victoireDirecte(X,Y,J,_,_,0):- retract(caseTest(X,Y,J)), false. %ménage si on perde derrière
-
-victoireDirecte(X,Y,J,_,_,-5):- assert(caseTest(X,Y,J)), false.
-
-victoireDirecte(X,Y,J,L,P,-5):- maximizer(J), Pp is -5-P, infinitePos(Pp,Value),
-	autreJoueur(J2), testDefaiteAnticipeeProchaine(J2),
-	assert(feuille(L, Value)), retract(caseTest(X,Y,J)). %Victoire anticipée du max
-victoireDirecte(X,Y,J,L,P,-5):- not(maximizer(J)), Pp is -5-P, infiniteNeg(Pp,Value),
-	autreJoueur(J2), testDefaiteAnticipeeProchaine(J2),
-	assert(feuille(L, Value)), retract(caseTest(X,Y,J)). %Victoire anticipée du min
-
-victoireDirecte(X,Y,J,_,_,-5):- retract(caseTest(X,Y,J)), false. %ménage si on perde derrière
 
 testDefaiteProchaine(J):-
 	calculPositionJeton(1,1,Y1), not(gagneTestDirect(1,Y1,J)),
@@ -302,86 +208,15 @@ minOuMax(Joueur,Score,-Score):- %minimizer
 minOuMax(_,Score,Score). %maximizer
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% Élagage alpha-bêta %%
-%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-choixVal(Valeur1,ValeurPrec,Val1):- joueurCourant(Joue), maximizer(Joue), Val1 is max(Valeur1, ValeurPrec). % we choose after the first choice if we take max or min for val
-choixVal(Valeur1,ValeurPrec,Val1):- Val1 is min(Valeur1, ValeurPrec).
-
-attribueVal(X):- infiniteNeg(InfN), joueurCourant(Joue), maximizer(Joue), X is InfN. % the initial value of a node (-inf if maximizer, +inf if minimizer)
-attribueVal(X):-infinitePos(InfP), X is InfP.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%For the Minimizer
-joueCoupSuivant(ValeurPrec,ColonneAJouer,_,_,L,Beta,Alpha,Val,Beta,Alpha):-
-	joueurCourant(Joue), not(maximizer(Joue)),
-	ValeurPrec =< Alpha, Val is ValeurPrec,
-	assert(feuille([ColonneAJouer|L], Val)).%coupure alpha !!
-joueCoupSuivant(ValeurPrec,ColonneAJouer,P1,Pmax,L,Beta,Alpha,Val,BetaCalc,Alpha):-
-	joueurCourant(Joue), not(maximizer(Joue)),
-	BetaCalc is min(Beta, ValeurPrec),
-	parcours(ColonneAJouer, P1,Pmax,[ColonneAJouer|L],BetaCalc, Alpha),
-	feuille([ColonneAJouer|L], ValeurFils),
-	Val is min(ValeurFils, ValeurPrec). %pas de coupure!
-
-
-%%For the Maximizer
-joueCoupSuivant(ValeurPrec,ColonneAJouer,_,_,L, Beta, Alpha,Val,Beta,Alpha):-
-	joueurCourant(Joue), maximizer(Joue),
-	ValeurPrec >= Beta, Val is ValeurPrec,
-	assert(feuille([ColonneAJouer|L], Val)).%coupure beta !!
-joueCoupSuivant(ValeurPrec,ColonneAJouer,P1,Pmax,L, Beta, Alpha,Val,Beta,AlphaCalc):-
-	joueurCourant(Joue), maximizer(Joue),
-	AlphaCalc is max(Alpha, ValeurPrec),
-	parcours(ColonneAJouer, P1,Pmax,[ColonneAJouer|L],Beta, AlphaCalc),
-	feuille([ColonneAJouer|L], ValeurFils),
-	Val is max(ValeurFils, ValeurPrec). %pas de coupure!
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-
 
 %%%%%%%%%% Aide calcul. Redundant code, do not remove %%%%%%%%%%%%%
-setJoueur(P):- parite(P), maximizer(jaune), joueurCourant(jaune),retract(joueurCourant(_)), assert(joueurCourant(rouge)),!. % si P pair, alors c'est au minimizer de jouer
-setJoueur(P):- parite(P), maximizer(rouge), joueurCourant(rouge),retract(joueurCourant(_)), assert(joueurCourant(jaune)),!.
-setJoueur(P):- not(parite(P)),maximizer(rouge), joueurCourant(jaune),retract(joueurCourant(_)), assert(joueurCourant(rouge)),!. % P impair, maximizer joue
-setJoueur(P):- not(parite(P)),maximizer(jaune), joueurCourant(rouge),retract(joueurCourant(_)), assert(joueurCourant(jaune)).
-setJoueur(_).
 
-choixValeurNoeud(L,R,Value):- joueurCourant(X), maximizer(X), coupAJouerMaximizer(L,R,Value),!. %on choisit val min ou max
-choixValeurNoeud(L,R,Value):- coupAJouerMinimizer(L,R,Value).
-
-
-coupAJouerMaximizer(L, R,X):- membreMaxRank(X,L,R).
-coupAJouerMinimizer(L, R,X):- membreMinRank(X,L,R).
-
-
-parite(X):- divmod(X ,2, _, 0).
 
 changerJoueur:- joueurCourant(jaune), retract(joueurCourant(_)), assert(joueurCourant(rouge)).
 changerJoueur:- joueurCourant(rouge), retract(joueurCourant(_)), assert(joueurCourant(jaune)).
 
 autreJoueur(rouge):- joueurCourant(jaune).
 autreJoueur(jaune):- joueurCourant(rouge).
-
-membreMaxRank(X, [Y|L], R):- membreMax(L, 1, 1, R, Y, X),!.
-membreMax([], _, Rm, Rm, Max, Max).
-membreMax([Y|L], R1, Rm, R, Max, X):- incr(R1,R2), maximum(Y, Max, Rm, R2, NewMax, NewRankMax), membreMax(L,R2,NewRankMax,R, NewMax, X).
-
-membreMinRank(X, [Y|L], R):- membreMin(L, 1, 1, R, Y, X),!.
-membreMin([], _, Rm, Rm, Max, Max).
-membreMin([Y|L], R1, Rm, R, Max, X):- incr(R1,R2), minimum(Y, Max, Rm, R2, NewMax, NewRankMax), membreMin(L,R2,NewRankMax,R, NewMax, X).
-
-minimum(Y, Max, _, NewRankMax, Y, NewRankMax):- Y<Max.
-minimum(_, Max,OldRankMax, _, Max, OldRankMax).
-
-maximum(Y, Max, _, NewRankMax, Y, NewRankMax):- Y>Max.
-maximum(_, Max,OldRankMax, _, Max, OldRankMax).
-
 
 
 %%% Place un jeton

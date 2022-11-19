@@ -49,36 +49,36 @@ typeHeuristique(7, 'poidsAlea').
 % Définition des différentes IA.
 typeJoueur(1,'Humain').
 typeJoueur(2,'IA Aléatoire').
-typeJoueur(3,'IA Minimax 1').
-typeJoueur(4,'IA Minimax 2').
-typeJoueur(5,'IA Minimax 3').
-typeJoueur(6,'IA Minimax 4').
-typeJoueur(7,'IA Minimax 5').
-typeJoueur(8,'IA Minimax 1 - Algo HeptarchieCorp').
-typeJoueur(9,'IA Minimax 2 - Algo HeptarchieCorp').
-typeJoueur(10,'IA Minimax 3 - Algo HeptarchieCorp').
-typeJoueur(11,'IA Minimax 4 - Algo HeptarchieCorp').
-typeJoueur(12,'IA Minimax 5 - Algo HeptarchieCorp').
+typeJoueur(11,'IA Minimax 1 - Algo HeptarchieCorp').
+typeJoueur(12,'IA Minimax 2 - Algo HeptarchieCorp').
+typeJoueur(13,'IA Minimax 3 - Algo HeptarchieCorp').
+typeJoueur(14,'IA Minimax 4 - Algo HeptarchieCorp').
+typeJoueur(15,'IA Minimax 5 - Algo HeptarchieCorp').
+typeJoueur(21,'IA Minimax 1 α/β - Algo HeptarchieCorp').
+typeJoueur(22,'IA Minimax 2 α/β - Algo HeptarchieCorp').
+typeJoueur(23,'IA Minimax 3 α/β - Algo HeptarchieCorp').
+typeJoueur(24,'IA Minimax 4 α/β - Algo HeptarchieCorp').
+typeJoueur(25,'IA Minimax 5 α/β - Algo HeptarchieCorp').
 
 % Définition d'IA préconfigurées
 typeJoueurPreconf(2,'IA Aléatoire',0,[],0).
-typeJoueurPreconf(3,'IA Minimax 3 - eval Position',0,[2],3).
-typeJoueurPreconf(4,'IA Minimax 3 - eval Position+Puissance3',0,[2,3],3).
-typeJoueurPreconf(5,'IA Minimax 4 - eval Position',0,[2],4).
-typeJoueurPreconf(6,'IA Minimax 4 - eval Position+Puissance3',0,[2,3],4).
-typeJoueurPreconf(7,'IA Minimax 5 - eval Position',0,[2],5).
-typeJoueurPreconf(8,'IA Minimax 5 - eval Position+Puissance3',0,[2,3],5).
-typeJoueurPreconf(9,'IA Minimax 3 - eval tests',0,[6],3).
-typeJoueurPreconf(10,'IA Minimax 4 - eval tests',0,[6],4).
-typeJoueurPreconf(11,'IA Minimax 5 - eval tests',0,[6],5).
-typeJoueurPreconf(12,'IA Minimax 1 - eval Configuration',0,[1],1).
-typeJoueurPreconf(13,'IA Minimax 2 - eval Configuration',0,[1],2).
-typeJoueurPreconf(14,'IA Minimax 3 - eval Configuration',0,[1],3).
-typeJoueurPreconf(15,'IA Minimax 4 - eval Configuration',0,[1],4).
-typeJoueurPreconf(16,'IA Minimax 5 - eval Configuration',0,[1],5).
-typeJoueurPreconf(17,'IA Minimax 1 - eval Configuration - new Algo',1,[1],1).
-typeJoueurPreconf(18,'IA Minimax 2 - eval Configuration - new Algo',1,[1],2).
-typeJoueurPreconf(19,'IA Minimax 3 - eval Configuration - new Algo',1,[1],3).
+typeJoueurPreconf(3,'IA Minimax 3 α/β - eval Position',2,[2],3).
+typeJoueurPreconf(4,'IA Minimax 3 α/β - eval Position+Puissance3',2,[2,3],3).
+typeJoueurPreconf(5,'IA Minimax 4 α/β - eval Position',2,[2],4).
+typeJoueurPreconf(6,'IA Minimax 4 α/β - eval Position+Puissance3',2,[2,3],4).
+typeJoueurPreconf(7,'IA Minimax 5 α/β - eval Position',2,[2],5).
+typeJoueurPreconf(8,'IA Minimax 5 α/β - eval Position+Puissance3',2,[2,3],5).
+typeJoueurPreconf(9,'IA Minimax 3 α/β - eval tests',2,[6],3).
+typeJoueurPreconf(10,'IA Minimax 4 α/β - eval tests',2,[6],4).
+typeJoueurPreconf(11,'IA Minimax 5 α/β - eval tests',2,[6],5).
+typeJoueurPreconf(12,'IA Minimax 1 α/β - eval Configuration',2,[1],1).
+typeJoueurPreconf(13,'IA Minimax 2 α/β - eval Configuration',2,[1],2).
+typeJoueurPreconf(14,'IA Minimax 3 α/β - eval Configuration',2,[1],3).
+typeJoueurPreconf(15,'IA Minimax 4 α/β - eval Configuration',2,[1],4).
+typeJoueurPreconf(16,'IA Minimax 5 α/β - eval Configuration',2,[1],5).
+typeJoueurPreconf(17,'IA Minimax 1 - eval Configuration',1,[1],1).
+typeJoueurPreconf(18,'IA Minimax 2 - eval Configuration',1,[1],2).
+typeJoueurPreconf(19,'IA Minimax 3 - eval Configuration',1,[1],3).
 
 changerJoueur :-
 	joueurCourant(rouge,TypeJoueurR, TypeEvalJoueurR),

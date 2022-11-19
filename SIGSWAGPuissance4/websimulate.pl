@@ -69,6 +69,10 @@ tourAction :-
 	write('Joueur '), write(CouleurJCourant), write(' vient de jouer dans la colonne '), write(Colonne), write('.'),  nl,
     statutJeu(Colonne,Ligne,CouleurJCourant).
 
+
+
+% obtenirCoup/1(+CouleurJCourant,+CodeIA,+ListEval,-Colonne)
+% Unifie à Colonne le coup joué par l'IA dont le code est CodeIA
 obtenirCoup(_,1,_,Colonne) :-
 	write('Saisissez votre colonne :'), nl,
     read(Colonne), integer(Colonne).
@@ -76,29 +80,26 @@ obtenirCoup(_,1,_,Colonne) :-
 obtenirCoup(_,2,_,Colonne) :-
 	iaAleatoire(Colonne).
 
-% obtenirCoup/1(+CouleurJCourant,+CodeIA,+ListEval,-Colonne)
-% Unifie à Colonne le coup joué par l'IA dont le code est CodeIA
-% CodeIA == 2 :- IA aleatoire
-obtenirCoup(CouleurJCourant,3,ListEval,Colonne) :-
-	iaMinimax(CouleurJCourant,Colonne,1,0,ListEval).
-obtenirCoup(CouleurJCourant,4,ListEval,Colonne) :-
-	iaMinimax(CouleurJCourant,Colonne,2,0,ListEval).
-obtenirCoup(CouleurJCourant,5,ListEval,Colonne) :-
-	iaMinimax(CouleurJCourant,Colonne,3,0,ListEval).
-obtenirCoup(CouleurJCourant,6,ListEval,Colonne) :-
-	iaMinimax(CouleurJCourant,Colonne,4,0,ListEval).
-obtenirCoup(CouleurJCourant,7,ListEval,Colonne) :-
-	iaMinimax(CouleurJCourant,Colonne,5,0,ListEval).
-obtenirCoup(CouleurJCourant,8,ListEval,Colonne) :-
-	iaMinimax(CouleurJCourant,Colonne,1,1,ListEval).
-obtenirCoup(CouleurJCourant,9,ListEval,Colonne) :-
-	iaMinimax(CouleurJCourant,Colonne,2,1,ListEval).
-obtenirCoup(CouleurJCourant,10,ListEval,Colonne) :-
-	iaMinimax(CouleurJCourant,Colonne,3,1,ListEval).
 obtenirCoup(CouleurJCourant,11,ListEval,Colonne) :-
-	iaMinimax(CouleurJCourant,Colonne,4,1,ListEval).
+	iaMinimax(CouleurJCourant,Colonne,1,1,ListEval).
 obtenirCoup(CouleurJCourant,12,ListEval,Colonne) :-
+	iaMinimax(CouleurJCourant,Colonne,2,1,ListEval).
+obtenirCoup(CouleurJCourant,13,ListEval,Colonne) :-
+	iaMinimax(CouleurJCourant,Colonne,3,1,ListEval).
+obtenirCoup(CouleurJCourant,14,ListEval,Colonne) :-
+	iaMinimax(CouleurJCourant,Colonne,4,1,ListEval).
+obtenirCoup(CouleurJCourant,15,ListEval,Colonne) :-
 	iaMinimax(CouleurJCourant,Colonne,5,1,ListEval).
+obtenirCoup(CouleurJCourant,21,ListEval,Colonne) :-
+	iaMinimax(CouleurJCourant,Colonne,1,2,ListEval).
+obtenirCoup(CouleurJCourant,22,ListEval,Colonne) :-
+	iaMinimax(CouleurJCourant,Colonne,2,2,ListEval).
+obtenirCoup(CouleurJCourant,23,ListEval,Colonne) :-
+	iaMinimax(CouleurJCourant,Colonne,3,2,ListEval).
+obtenirCoup(CouleurJCourant,24,ListEval,Colonne) :-
+	iaMinimax(CouleurJCourant,Colonne,4,2,ListEval).
+obtenirCoup(CouleurJCourant,25,ListEval,Colonne) :-
+	iaMinimax(CouleurJCourant,Colonne,5,2,ListEval).
 
 %%%%%%%%%%%%%%%
 %%  Utilitaires

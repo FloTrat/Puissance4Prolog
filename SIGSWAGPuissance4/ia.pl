@@ -55,6 +55,7 @@ iaAleatoire(Coup) :-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% iaMinimax(+Joueur,-Coup,+Profondeur,+ChoixAlgo,+ListEval)
 iaMinimax(JoueurCourant,Coup,Profondeur,ChoixAlgo,ListEval) :-
 	memberRetInt(1,ListEval, EvalConf),
     memberRetInt(2,ListEval, EvalPosition),
