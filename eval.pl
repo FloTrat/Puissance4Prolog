@@ -60,7 +60,7 @@ evalJeu(JoueurCourant,AutreJoueur,X,Y,Score) :-
 % Évalue en cherchant les jetons qui peuvent potentiellement faire gagner.
 % ScoreFinal s'unifie au score de la grille.
 evalTest(_,_,0,0) :- !.
-evalTest(JoueurCourant,AutreJoueur,ScoreFinal,PoidsTest) :-
+evalTest(JoueurCourant,AutreJoueur,ScoreFinal,_) :-
 	findall(S,evalJetonsTest(JoueurCourant,S),ScoresCourant), sum(ScoresCourant,ScoreCourant),
 	findall(S,evalJetonsTest(AutreJoueur,S),ScoresAutre), sum(ScoresAutre,ScoreAutre),
 	ScoreFinal is ScoreCourant - ScoreAutre.
