@@ -30,5 +30,7 @@ Hexanôme H4132 - 2022-2023
 - Korantin Aimé [GitHub](https://github.com/Xynaanthrok) [GitLab](https://gitlab.com/Xynaanthrok)
 - Jules Sanglier [GitHub](https://github.com/julessanglier) [GitLab](https://gitlab.com/julessanglier)
 - Malak Fawzi [GitLab](https://gitlab.com/malak-fawzi)
-- [GitLab](https://gitlab.com/tseds)
+- M. Castillon [GitLab](https://gitlab.com/tseds)
 - Florian Pautrat [GitHub](https://github.com/FloTrat) [GitLab](https://gitlab.com/FloTrat)
+
+Tous nos projets sont disponibles sur [GitLab](https://gitlab.com/insa-lyon-4if).
