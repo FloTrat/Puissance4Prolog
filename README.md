@@ -22,3 +22,13 @@ Les fichiers sources sont séparés en deux parties : les prédicats "publics" (
 
 ## Modification du code de l'ancien projet
 Les modifications que nous avons apportées au code de l'ancien projet sont marquées par l'annotation commentée `"Modification du code source"` au début et par `"Fin de modification du code source"` en fin de code ajouté. Les modifications sont présentes un peu partout dans le code d'origine, mais nous avons principalement implémenté 2 nouvelles heuristiques (dans le fichier `eval.pl`) et réimplémenté les algorithmes MiniMax avec et sans élagage Alpha/Beta.
+
+## Membres du projet
+Hexanôme H4132 - 2022-2023
+- Antonin Marxer [GitHub](https://github.com/PheonBest) [GitLab](https://gitlab.com/PheonBest)
+- Malo Olivier [GitHub](https://github.com/Lomax333) [GitLab](https://gitlab.com/Lomax333)
+- Korantin Aimé [GitHub](https://github.com/Xynaanthrok) [GitLab](https://gitlab.com/Xynaanthrok)
+- Jules Sanglier [GitHub](https://github.com/julessanglier) [GitLab](https://gitlab.com/julessanglier)
+- Malak Fawzi [GitLab](https://gitlab.com/malak-fawzi)
+- [GitLab](https://gitlab.com/tseds)
+- Florian Pautrat [GitHub](https://github.com/FloTrat) [GitLab](https://gitlab.com/FloTrat)
