@@ -66,7 +66,7 @@ iaAleatoire(Coup) :-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% iaMinimax(+Joueur,-Coup,+Profondeur,+ChoixAlgo,+ListEval)
+% iaMinimax(+Joueur,-Coup,+ProfondeurMax,+ChoixAlgo,+ListEval)
 iaMinimax(JoueurCourant,Coup,Profondeur,ChoixAlgo,ListEval) :-
 	memberRetInt(0,ListEval, TestVictoireDirecte),
 	memberRetInt(1,ListEval, EvalConf),

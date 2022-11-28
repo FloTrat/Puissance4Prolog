@@ -31,11 +31,11 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% parcoursArbre/5(+Joueur,+Pmax,+ChoixAlgo,-BestX,-BestScore)
+% parcoursArbre/5(+Joueur,+ProfondeurMax,+ChoixAlgo,-MeilleureColonne,-MeilleurScore)
 parcoursArbre(J,Pmax,1,BestX,BestScore) :-
 	initCaseTest,assert(maximizer(J)), assert(joueurCourant(J)),
 	nbColonnes(NBCOLONNES),
-	bestScoreCol(NBCOLONNES,Pmax,BestScore,BestXList),
+	bestScoreCol(NBCOLONNES,1,Pmax,BestScore,BestXList),
 	random_member(BestX, BestXList),
 	%write("BestX: "), write(BestX), write(" Score: "), write(BestScore), nl,
 	clearTest,!.
@@ -45,106 +45,120 @@ parcoursArbre(J,Pmax,2,BestX,BestScore) :-
 	nbColonnes(NBCOLONNES),
 	infiniteNeg(Alpha),
 	infinitePos(Beta),
-	bestScoreColAB(NBCOLONNES,Pmax,BestScore,BestXList,Alpha,Beta),
+	bestScoreColAB(NBCOLONNES,1,Pmax,BestScore,BestXList,Alpha,Beta),
 	random_member(BestX, BestXList),
 	%write("BestX: "), write(BestX), write(" Score: "), write(BestScore), nl,
 	clearTest,!.
 
-% bestScoreColAB/6(+Col,+P,-BestScore,-BestX,+Alpha,+Beta)
-bestScoreColAB(1,Pmax,BestScore,[1],Alpha,Beta) :-
-	parcoursAB(1,Pmax,BestScore,Alpha,Beta).
-bestScoreColAB(X,Pmax,BestScore,BestXList,Alpha,Beta) :-
-	parcoursAB(X,Pmax,ScoreX,Alpha,Beta),
-	%write("X: "),write(X),write(" Score: "),write(ScoreX),nl,
-	coupureAB(X,ScoreX,Pmax,BestXList,BestScore,Alpha,Beta).
+%%%%%%%%%%%%%%%% MINIMAX avec elagage ALPHA/BETA %%%%%%%%%%%%%%%%
 
-% coupureAB/7(+X,+ScoreX,+Pmax,-BestXList,-BestScore,+Alpha,+Beta).
-coupureAB(X,ScoreX,_,[X],ScoreX,_,Beta):-
+% bestScoreColAB/7(+Colonne,+Profondeur,+ProfondeurMax,-MeilleurScore,-MeilleuresColonne,+Alpha,+Beta)
+bestScoreColAB(1,P,Pmax,BestScore,[1],Alpha,Beta) :-
+	parcoursAB(1,P,Pmax,BestScore,Alpha,Beta).
+bestScoreColAB(X,P,Pmax,BestScore,BestXList,Alpha,Beta) :-
+	parcoursAB(X,P,Pmax,ScoreX,Alpha,Beta),
+	%write("X: "),write(X),write(" Score: "),write(ScoreX),nl,
+	coupureAB(X,ScoreX,P,Pmax,BestXList,BestScore,Alpha,Beta).
+
+% coupureAB/8(+Colonne,+ScoreCplonne,+Profondeur,+ProfondeurMax,-MeilleuresColonnes,-MeilleurScore,+Alpha,+Beta).
+% MeilleuresColonnes correspond à la liste des colonnes, de la colonne X à 1, qui ont donnent un score égale à MeilleurScore
+coupureAB(X,ScoreX,_,_,[X],ScoreX,_,Beta):-
 	% coupure Beta
 	joueurCourant(J), maximizer(J),
 	ScoreX > Beta.
-coupureAB(X,ScoreX,Pmax,BestXList,BestScore,Alpha,Beta):-
+coupureAB(X,ScoreX,P,Pmax,BestXList,BestScore,Alpha,Beta):-
 	joueurCourant(J), maximizer(J),
 	decr(X,X1),
 	NewAlpha is max(Alpha,ScoreX),
-	bestScoreColAB(X1,Pmax,BestScoreX1,BestX1List,NewAlpha,Beta),
+	bestScoreColAB(X1,P,Pmax,BestScoreX1,BestX1List,NewAlpha,Beta),
 	compScore(X,ScoreX,BestX1List,BestScoreX1,BestXList,BestScore).
-coupureAB(X,ScoreX,_,[X],ScoreX,Alpha,_):-
+coupureAB(X,ScoreX,_,_,[X],ScoreX,Alpha,_):-
 	% coupure Alpha
 	joueurCourant(J), not(maximizer(J)),
 	ScoreX < Alpha.
-coupureAB(X,ScoreX,Pmax,BestXList,BestScore,Alpha,Beta):-
+coupureAB(X,ScoreX,P,Pmax,BestXList,BestScore,Alpha,Beta):-
 	joueurCourant(J), not(maximizer(J)),
 	decr(X,X1),
 	NewBeta is min(Beta,ScoreX),
-	bestScoreColAB(X1,Pmax,BestScoreX1,BestX1List,Alpha,NewBeta),
+	bestScoreColAB(X1,P,Pmax,BestScoreX1,BestX1List,Alpha,NewBeta),
 	compScore(X,ScoreX,BestX1List,BestScoreX1,BestXList,BestScore).
 
-% parcoursAB/5(+X,+P,-BestScoreX,+Alpha,+Beta)
-parcoursAB(X,_,ScoreX,_,_) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,ScoreX).
-parcoursAB(X,_,ScoreX,_,_) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), not(maximizer(Joue)), infinitePos(2,ScoreX).
-parcoursAB(X,_,ScoreX,_,_) :- nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), evaluate(X,NBLIGNES,Joue,ScoreX).
-parcoursAB(X, P, ScoreX,_,_):-
+% parcoursAB/6(+Colonne,+Profondeur,+Pmax,-Score,+Alpha,+Beta)
+parcoursAB(X,_,_,ScoreX,_,_) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,ScoreX).
+parcoursAB(X,_,_,ScoreX,_,_) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), not(maximizer(Joue)), infinitePos(2,ScoreX).
+parcoursAB(X,_,_,ScoreX,_,_) :- nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), evaluate(X,NBLIGNES,Joue,ScoreX).
+parcoursAB(X, P,_, ScoreX,_,_):-
 	testVictoireDirecte(TestVictoireDirecte), TestVictoireDirecte>0,
 	joueurCourant(Joue), calculPositionJeton(X, 1, Y), gagneTest(X,Y,Joue,Direct), victoireDirecte(X,Y,Joue,P,Direct,ScoreX).
-parcoursAB(X,1,ScoreX,_,_) :- joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, ScoreX), retract(caseTest(X,Y,Joue)).
-parcoursAB(X,P,BestScore,Alpha,Beta) :-
+parcoursAB(X,Pmax,Pmax,ScoreX,_,_) :- joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, ScoreX), retract(caseTest(X,Y,Joue)).
+parcoursAB(X,P,Pmax,BestScore,Alpha,Beta) :-
 	%write("X: "),write(X),write(" P: "),write(P),nl,
 	joueurCourant(J),
 	placerJeton(X,Y,J),
 	nbColonnes(NBCOLONNES),
-	decr(P,NewP),
+	incr(P,NewP),
 	changerJoueur,
-	bestScoreColAB(NBCOLONNES,NewP,BestScore,_,Alpha,Beta),
+	bestScoreColAB(NBCOLONNES,NewP,Pmax,BestScore,_,Alpha,Beta),
 	changerJoueur,
 	retract(caseTest(X,Y,J)).
 
-% bestScoreCol/4(+X,+P,-BestScore,-BestXList)
-bestScoreCol(1,Pmax,BestScore,[1]) :-
-	parcours(1,Pmax,BestScore).
+
+%%%%%%%%%%%%%%%% MINIMAX sans elagage ALPHA/BETA %%%%%%%%%%%%%%%%
+
+% bestScoreCol/5(+Colonne,+Profondeur,+Pmax,-MeilleurScore,-MeilleuresColonnes)
+bestScoreCol(1,P,Pmax,BestScore,[1]) :-
+	parcours(1,P,Pmax,BestScore).
 	%write("X: "),write(1),write(" Score: "),write(BestScore),nl,!.
-bestScoreCol(X,Pmax,BestScore,BestXList) :- % pour afficher le score final pour chaque colonne
-	parcours(X,Pmax,ScoreX),
+bestScoreCol(X,P,Pmax,BestScore,BestXList) :- % pour afficher le score final pour chaque colonne
+	parcours(X,P,Pmax,ScoreX),
 	%write("X: "),write(X),write(" Score: "),write(ScoreX),nl,
 	decr(X,X1),
-	bestScoreCol(X1,Pmax,BestScoreX1,BestX1List),
+	bestScoreCol(X1,P,Pmax,BestScoreX1,BestX1List),
 	compScore(X,ScoreX,BestX1List,BestScoreX1,BestXList,BestScore).
-bestScoreCol(X,Pmax,BestScore,BestXList) :-
-	parcours(X,Pmax,ScoreX),
+bestScoreCol(X,P,Pmax,BestScore,BestXList) :-
+	parcours(X,P,Pmax,ScoreX),
 	%write("P: "),write(Pmax),write(" X: "),write(X),write(" Score: "),write(ScoreX),nl,
 	decr(X,X1),
-	bestScoreCol(X1,Pmax,BestScoreX1,BestX1List),
+	bestScoreCol(X1,P,Pmax,BestScoreX1,BestX1List),
 	compScore(X,ScoreX,BestX1List,BestScoreX1,BestXList,BestScore).
 
-% compScore/6(+X,+ScoreX,+X1List,+ScoreX1,-BestXList,-BestScore)
-compScore(X,ScoreX,X1List,ScoreX,[X|X1List],ScoreX).
-compScore(X,ScoreX,_,ScoreX1,[X],ScoreX) :-
-	joueurCourant(J), maximizer(J),
-	ScoreX > ScoreX1.
-compScore(_,_,X1List,ScoreX1,X1List,ScoreX1) :-
-	joueurCourant(J), maximizer(J).
-compScore(X,ScoreX,_,ScoreX1,[X],ScoreX) :-
-	ScoreX < ScoreX1.
-compScore(_,_,X1List,ScoreX1,X1List,ScoreX1).
-
-% parcours/3(+X,+P,-BestScoreX)
-parcours(X,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,ScoreX).
-parcours(X,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), not(maximizer(Joue)), infinitePos(2,ScoreX).
-parcours(X,_,ScoreX) :- nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), evaluate(X,NBLIGNES,Joue,ScoreX).
-parcours(X, P, ScoreX):-
+% parcours/4(+Colonne,+Profondeur,+Pmax,-Score)
+parcours(X,_,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), maximizer(Joue), infiniteNeg(2,ScoreX).
+parcours(X,_,_,ScoreX) :- nbLignes(NBLIGNES),case(X,NBLIGNES,_), joueurCourant(Joue), not(maximizer(Joue)), infinitePos(2,ScoreX).
+parcours(X,_,_,ScoreX) :- nbLignes(NBLIGNES),caseTest(X,NBLIGNES,_), joueurCourant(Joue), evaluate(X,NBLIGNES,Joue,ScoreX).
+parcours(X, P,_, ScoreX):-
 	testVictoireDirecte(TestVictoireDirecte), TestVictoireDirecte>0,
 	joueurCourant(Joue), calculPositionJeton(X, 1, Y), gagneTest(X,Y,Joue,Direct), victoireDirecte(X,Y,Joue,P,Direct,ScoreX).
-parcours(X,1,ScoreX) :- joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, ScoreX), retract(caseTest(X,Y,Joue)).
-parcours(X,P,BestScore) :-
+parcours(X,Pmax,Pmax,ScoreX) :- joueurCourant(Joue), placerJeton(X,Y,Joue), evaluate(X, Y, Joue, ScoreX), retract(caseTest(X,Y,Joue)).
+parcours(X,P,Pmax,BestScore) :-
 	%write("X: "),write(X),write(" P: "),write(P),nl,
 	joueurCourant(J),
 	placerJeton(X,Y,J),
 	nbColonnes(NBCOLONNES),
-	decr(P,NewP),
+	incr(P,NewP),
 	changerJoueur,
-	bestScoreCol(NBCOLONNES,NewP,BestScore,_),
+	bestScoreCol(NBCOLONNES,NewP,Pmax,BestScore,_),
 	changerJoueur,
 	retract(caseTest(X,Y,J)).
+
+
+
+% compScore/6(+ColonneX,+ScoreX,+MeilleuresColonnesX1,+MeilleurScoreX1,-MeilleuresColonnes,-MeilleurScore)
+% MeilleuresColonnes est la liste des colonnes qui donnent le MeilleurScore (minimum ou maximum en fonction du joueur)
+compScore(X,ScoreX,X1List,ScoreX,[X|X1List],ScoreX) :- !.
+compScore(X,ScoreX,_,ScoreX1,[X],ScoreX) :-
+	joueurCourant(J), maximizer(J),
+	ScoreX > ScoreX1, !.
+compScore(_,_,X1List,ScoreX1,X1List,ScoreX1) :-
+	joueurCourant(J), maximizer(J), !.
+compScore(X,ScoreX,_,ScoreX1,[X],ScoreX) :-
+	ScoreX < ScoreX1, !.
+compScore(_,_,X1List,ScoreX1,X1List,ScoreX1) :- !.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fin de modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 victoireDirecte(_,_,J,P,1,Value):- maximizer(J), Pp is 1-P, infinitePos(Pp,Value). %Victoire du max
 victoireDirecte(_,_,J,P,1,Value):- not(maximizer(J)), Pp is 1-P, infiniteNeg(Pp,Value). %Victoire du min
@@ -170,10 +184,6 @@ victoireDirecte(X,Y,J,P,-5,Value):- not(maximizer(J)), Pp is -5-P, infiniteNeg(P
 	retract(caseTest(X,Y,J)). %Victoire anticipée du min
 
 victoireDirecte(X,Y,J,_,-5,_):- retract(caseTest(X,Y,J)), false. %ménage si on perde derrière
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fin de modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 %%%%%%%%%%%%%%%%%%%%%%

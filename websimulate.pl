@@ -67,7 +67,7 @@ tourAction :-
 
 
 
-% obtenirCoup/1(+CouleurJCourant,+CodeIA,+ListEval,-Colonne)
+% obtenirCoup/4(+CouleurJCourant,+CodeIA,+ListEval,-Colonne)
 % Unifie à Colonne le coup joué par l'IA dont le code est CodeIA
 obtenirCoup(_,1,_,Colonne) :-
 	write('Saisissez votre colonne :'), nl,

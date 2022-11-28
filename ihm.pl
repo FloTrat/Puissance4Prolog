@@ -58,27 +58,26 @@ evals(X,[X|ListEval]) :- read(Y), evals(Y,ListEval).
 
 emptyList([]).
 
-% demandeTypeDeJeu/1(-TypeDeJeu)
-% Demande à l'utilisateur de saisir un type de jeu. N'échoue pas en cas d'entrée invalide (en dehors des valeurs possibles).
-% TypeDeJeu s'unifie au type saisi par l'utilisateur.
-demandeTypeDeJeu(TypeIA, TypeEval) :-
+% demandeTypeDeJeu/1(-CodeIA,-ListEval)
+% Demande à l'utilisateur de saisir un type d'IA et la liste des heuristiques à utiliser.
+demandeTypeDeJeu(CodeIA, ListEval) :-
 	write('   --- Puissance 4 ---'), nl,
 	write('   --- Veuillez choisir une IA ---'), nl,
 	findall(_, afficherTypeJoueur(_,_), _),
 	nl, nl,
 	write(' ----------------------- '), nl,
     write('Saisissez votre choix :'), nl,
-    read(TypeIA), integer(TypeIA),
+    read(CodeIA), integer(CodeIA),
 
-	((TypeIA =\= 1, TypeIA =\= 2) ->
+	((CodeIA =\= 1, CodeIA =\= 2) ->
 		nl,
 		write(' ----------------------- '), nl,
 		write('   --- Veuillez choisir une ou plusieurs heuristiques ---'), nl,
 		write('   --- ex: Pour choisir l''heuristique 1, entrer ''1.'' puis ''end.'' ---'), nl,
 		findall(_, afficherTypeHeuristique(_,_), _),
 		write(' ----------------------- '), nl,
-		readEval(TypeEval)
-	;emptyList(TypeEval)).
+		readEval(ListEval)
+	;emptyList(ListEval)).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Fin de modification du code source %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
