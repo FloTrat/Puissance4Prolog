@@ -194,8 +194,7 @@ initCaseTest :- case(X,Y,Z), assert(caseTest(X,Y,Z)), false. %on assert une case
 initCaseTest.
 
 clearTest :-
-	retractall(caseTest(X,Y,_)),
-	retractall(feuille(X,Y)),
+	retractall(caseTest(X,_,_)),
 	retract(maximizer(X)), retract(joueurCourant(_)). % on eve tout ce que l'on a ajouté.
 
 testDefaiteProchaine(J):-
